@@ -12,7 +12,7 @@ app.use(cors());
 app.use("/api/auth", auth);
 
 app.get("/", (req, res) => {
-  res.status(200).json({ status: "Successfull API call" });
+  res.status(200).json({ status: "Updated API call message" });
 });
 
 app.listen(port, () => {
