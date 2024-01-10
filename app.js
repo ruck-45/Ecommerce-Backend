@@ -11,6 +11,10 @@ app.use(cors());
 // Routes
 app.use("/api/auth", auth);
 
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "Successfull API call" });
+});
+
 app.listen(port, () => {
   console.log("Server Listening on PORT:", port);
 });
