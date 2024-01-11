@@ -3,7 +3,7 @@ const cors = require("cors");
 
 const auth = require("./routes/auth");
 
-const port = 443;
+const port = process.env.PORT || 5000;
 
 const app = express();
 app.use(cors());
