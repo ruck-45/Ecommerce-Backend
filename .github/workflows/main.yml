@@ -25,6 +25,7 @@ jobs:
           host: ${{ secrets.ftp_server }}
           username: ${{ secrets.ssh_username }}
           port: ${{ secrets.ssh_port }}
+          passphrase: ${{ secrets.ssh_passphrase }}
           script: |
             source ${{ secrets.node_dir }} && cd ${{ secrets.root_dir }}
             npm install
