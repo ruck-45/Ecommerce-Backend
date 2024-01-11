@@ -27,7 +27,4 @@ jobs:
           port: ${{ secrets.ssh_port }}
           passphrase: ${{ secrets.ssh_passphrase }}
           script: |
-            source ${{ secrets.node_dir }} && cd ${{ secrets.root_dir }}
-            npm ci --legacy-peer-deps
-            cloudlinux-selector stop --json --interpreter nodejs --user ${{ secrets.ssh_username }} --app-root ${{ secrets.root_dir }}
-            cloudlinux-selector start --json --interpreter nodejs --user ${{ secrets.ssh_username }} --app-root ${{ secrets.root_dir }}
+            cloudlinux-selector restart --json --interpreter nodejs --user ${{ secrets.ssh_username }} --app-root ${{ secrets.root_dir }}
