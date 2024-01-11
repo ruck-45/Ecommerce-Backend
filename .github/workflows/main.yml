@@ -17,3 +17,16 @@ jobs:
           server: ${{ secrets.ftp_server }}
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
+
+      - name: 🖥️ Restart Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          key: ${{ secrets.ssh_key }}
+          host: ${{ secrets.ftp_server }}
+          username: ${{ secrets.ssh_username }}
+          port: ${{ secrets.ssh_port }}
+          script: |
+            source ${{ secrets.node_dir }} && cd ${{ secrets.root_dir }}
+            npm install
+            cloudlinux-selector stop --json --interpreter nodejs --user ${{ secrets.ssh_username }} --app-root ${{ secrets.root_dir }}
+            cloudlinux-selector start --json --interpreter nodejs --user ${{ secrets.ssh_username }} --app-root ${{ secrets.root_dir }}
