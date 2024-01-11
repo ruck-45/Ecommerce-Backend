@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^cerebrum\.hmsfreedom\.com$ [NC]
+RewriteRule ^ http://162.213.251.215:443%{REQUEST_URI} [P,QSA,L]
