@@ -5,7 +5,7 @@ const connection = require("./connect");
 
 const auth = require("./routes/auth");
 
-const port = process.env.PORT;
+const port = 5000;
 
 const app = express();
 app.use(cors());
