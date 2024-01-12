@@ -29,5 +29,4 @@ jobs:
           script: |
             source ${{ secrets.node_dir }} && cd ${{ secrets.root_dir }}
             npm install
-            npm run delete
-            npm start
+            npm run restart
