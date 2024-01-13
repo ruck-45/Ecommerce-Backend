@@ -1,18 +1,13 @@
 // Local Files
-const { genHashPassword } = require("../utils/password");
-const { insertUser } = require("../utils/database");
+const { genHashPassword, validatePassword } = require("../utils/password");
+const { issueJWT } = require("../utils/jwt");
+const { executeQuery } = require("../utils/database");
+const { insertUserDetails, findUserEmail } = require("../constants/queries");
 
 const genUid = (counter) => {
-  // Timestamp component (DDMMYY)
+  // Timestamp component (YYYYMMDDHHMMSS)
   const currentDate = new Date();
-  const yearComponent = currentDate.getUTCFullYear().toString().slice(2, 4); // Extract the last two digits of the year
-  const monthComponent = (currentDate.getUTCMonth() + 1).toString().padStart(2, "0");
-  const dayComponent = currentDate.getUTCDate().toString().padStart(2, "0");
-  const hourComponent = currentDate.getUTCHours().toString().padStart(2, "0");
-  const minuteComponent = currentDate.getUTCMinutes().toString().padStart(2, "0");
-  const secondComponent = currentDate.getUTCSeconds().toString().padStart(2, "0");
-
-  const timestampComponent = `${yearComponent}${monthComponent}${dayComponent}${hourComponent}${minuteComponent}${secondComponent}`;
+  const timestampComponent = currentDate.toISOString().slice(0, 19).replace(/[-:T]/g, "");
 
   // Random component (5 digits)
   const randomComponent = Math.floor(Math.random() * 100000)
@@ -56,15 +51,65 @@ const createUser = async (req, res) => {
 
   // Insert Into Database
   const details = [userId, username, salt, hashPassword, email];
-  const success = await insertUser(details);
+  const qreryRes = await executeQuery(insertUserDetails, details);
 
-  if (!success) {
-    return res.status(501).json({ success: false, message: "User Creation Failed" });
+  // Return If Creation Unsuccessful
+  if (!qreryRes.success) {
+    return res.status(501).json({ success: qreryRes.success, message: qreryRes.result });
   }
 
   return res.status(201).json({ success: true, message: "User Creation Successful" });
 };
 
+/**
+ *
+ * email : maximum char - 100
+ * remember : Boolean
+ *
+ */
+
+const loginUser = async (req, res) => {
+  const { email, password, remember } = req.body;
+
+  // Return If Partial Information Provided
+  if (email === undefined || remember === undefined || password === undefined) {
+    return res.status(206).json({ success: false, message: "Partial Content Provided" });
+  }
+
+  // Return If Data Exceeds Length
+  if (email.length > 100) {
+    return res.status(406).json({ success: false, message: "Data Not Acceptable" });
+  }
+
+  // Search User In Database
+  const qreryRes = await executeQuery(findUserEmail, [email]);
+  const userDetails = qreryRes.result[0];
+
+  // Return If Query Unsuccessful
+  if (userDetails.length === 0) {
+    return res.status(404).json({ success: false, message: "User Not Found" });
+  }
+
+  // Extracting user Details
+  const userId = userDetails[0].user_id;
+  const salt = userDetails[0].password_salt;
+  const hashPassword = userDetails[0].password_hash;
+
+  // Validating Password
+  const passwordValidity = validatePassword(password, hashPassword, salt);
+
+  // Return If Invalid Password
+  if (!passwordValidity) {
+    return res.status(400).json({ success: false, message: "Invalid Password" });
+  }
+
+  // Issue JWT
+  const jwt = issueJWT(userId, remember);
+  
+  return res.status(201).json({ success: true, message: { message: "User Authenticated Successfully", ...jwt } });
+};
+
 module.exports = {
   createUser,
+  loginUser,
 };

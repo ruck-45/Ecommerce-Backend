@@ -2,7 +2,7 @@ const checkDatabase = `SHOW TABLES`;
 
 const createUsersTable = `
       CREATE TABLE IF NOT EXISTS users (
-        user_id VARCHAR(30) PRIMARY KEY,
+        user_id VARCHAR(30) UNIQUE PRIMARY KEY,
         username VARCHAR(50) NOT NULL,
         password_salt VARCHAR(64) NOT NULL,
         password_hash VARCHAR(128) NOT NULL,
@@ -16,8 +16,11 @@ const insertUserDetails = `
   VALUES (?, ?, ?, ?, ?)
 `;
 
+const findUserEmail = `SELECT * FROM users WHERE email = ?`;
+
 module.exports = {
   checkDatabase,
   createUsersTable,
   insertUserDetails,
+  findUserEmail,
 };

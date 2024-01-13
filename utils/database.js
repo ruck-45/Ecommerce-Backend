@@ -1,5 +1,5 @@
-const pool = require("../connect");
-const { checkDatabase, createUsersTable, insertUserDetails } = require("../constants/queries");
+const pool = require("../config/databaseConfig");
+const { checkDatabase, createUsersTable } = require("../constants/queries");
 
 const executeQuery = async (query, values = []) => {
   let success;
@@ -37,18 +37,8 @@ const createAuthTable = async () => {
   }
 };
 
-const insertUser = async (details) => {
-  const res = await executeQuery(insertUserDetails, details);
-
-  console.log(
-    `User Creation ${res.success ? "Successful" : "Unsuccessful"}. Result : ${JSON.stringify(res.result[0])}`
-  );
-  return res.success;
-};
-
 module.exports = {
   executeQuery,
   testConnection,
   createAuthTable,
-  insertUser,
 };
