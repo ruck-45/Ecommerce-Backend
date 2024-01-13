@@ -27,6 +27,4 @@ const genKeyPair = () => {
   fs.writeFileSync(path.join(__dirname, "..", "secrets", "rsaPrivKey.pem"), keyPair.privateKey);
 };
 
-module.exports = {
-  genKeyPair,
-};
+genKeyPair();
