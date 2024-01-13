@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 
 // Local Files
-const auth = require("./routes/auth");
+const users = require("./routes/users");
 const { testConnection, createAuthTable } = require("./utils/database");
 
 const port = process.env.PORT;
@@ -13,10 +13,10 @@ const app = express();
 // Essential Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 // Routes
-app.use("/api/auth", auth);
+app.use("/api/users", users);
 
 // Database Connection and Configuration
 testConnection();
