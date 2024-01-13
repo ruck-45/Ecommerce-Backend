@@ -18,9 +18,12 @@ const insertUserDetails = `
 
 const findUserEmail = `SELECT * FROM users WHERE email = ?`;
 
+const findUserId = `SELECT * FROM users WHERE user_id = ?`;
+
 module.exports = {
   checkDatabase,
   createUsersTable,
   insertUserDetails,
   findUserEmail,
+  findUserId,
 };

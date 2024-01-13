@@ -40,7 +40,7 @@ const createUser = async (req, res) => {
 
   // Return If Data Exceeds Length
   if (username.length > 50 || email.length > 100) {
-    return res.status(406).json({ success: false, message: "Data Not Acceptable" });
+    return res.status(406).json({ success: false, message: "Not Acceptable. Data Length Exceeds Limit" });
   }
 
   // Hash Password generation
@@ -78,7 +78,7 @@ const loginUser = async (req, res) => {
 
   // Return If Data Exceeds Length
   if (email.length > 100) {
-    return res.status(406).json({ success: false, message: "Data Not Acceptable" });
+    return res.status(406).json({ success: false, message: "Not Acceptable. Data Length Exceeds Limit" });
   }
 
   // Search User In Database
@@ -87,7 +87,7 @@ const loginUser = async (req, res) => {
 
   // Return If Query Unsuccessful
   if (userDetails.length === 0) {
-    return res.status(404).json({ success: false, message: "User Not Found" });
+    return res.status(401).json({ success: false, message: "User Not Found" });
   }
 
   // Extracting user Details
@@ -100,16 +100,21 @@ const loginUser = async (req, res) => {
 
   // Return If Invalid Password
   if (!passwordValidity) {
-    return res.status(400).json({ success: false, message: "Invalid Password" });
+    return res.status(401).json({ success: false, message: "Invalid Password" });
   }
 
   // Issue JWT
   const jwt = issueJWT(userId, remember);
-  
+
   return res.status(201).json({ success: true, message: { message: "User Authenticated Successfully", ...jwt } });
+};
+
+const getProfile = (req, res) => {
+  res.status(200).json({ status: "success", message: "Entered into Profile Page" });
 };
 
 module.exports = {
   createUser,
   loginUser,
+  getProfile,
 };
