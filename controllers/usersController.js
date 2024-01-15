@@ -58,7 +58,7 @@ const createUser = async (req, res) => {
     return res.status(501).json({ success: qreryRes.success, payload: qreryRes.result });
   }
 
-  return res.status(201).json({ success: true, payload : {message: "User Creation Successful"} });
+  return res.status(201).json({ success: true, payload: { message: "User Creation Successful" } });
 };
 
 /**
@@ -120,6 +120,7 @@ const loginUser = async (req, res) => {
 };
 
 const getProfile = (req, res) => {
+  console.log(req.user);
   res.status(200).json({ status: "success", payload: { message: "Entered into Profile Page" } });
 };
 

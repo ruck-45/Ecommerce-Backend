@@ -2,7 +2,7 @@ const checkDatabaseQuery = `SHOW TABLES`;
 
 const createUsersTableQuery = `
       CREATE TABLE IF NOT EXISTS users (
-        user_id VARCHAR(30) UNIQUE PRIMARY KEY,
+        user_id VARCHAR(30) PRIMARY KEY,
         username VARCHAR(50) NOT NULL,
         password_salt VARCHAR(64) NOT NULL,
         password_hash VARCHAR(128) NOT NULL,
@@ -22,7 +22,7 @@ const findUserIdQuery = `SELECT * FROM users WHERE user_id = ?`;
 
 const createEmployeesTableQuery = `
       CREATE TABLE IF NOT EXISTS employees (
-        user_id VARCHAR(30) UNIQUE NOT NULL,
+        user_id VARCHAR(30) UNIQUE PRIMARY KEY,
         FOREIGN KEY (user_id) REFERENCES users(user_id)
       )
     `;

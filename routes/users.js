@@ -11,7 +11,6 @@ const router = Router();
 // routes
 router.route("/signup").post(updateRegisterCounter, createUser);
 router.route("/login").post(loginUser);
-
 router.route("/profile").get(passport.authenticate("jwt", { session: false }), getProfile);
 
 module.exports = router;
