@@ -22,12 +22,27 @@ const findUserIdQuery = `SELECT * FROM users WHERE user_id = ?`;
 
 const createEmployeesTableQuery = `
       CREATE TABLE IF NOT EXISTS employees (
-        user_id VARCHAR(30) UNIQUE PRIMARY KEY,
+        user_id VARCHAR(30) PRIMARY KEY,
         FOREIGN KEY (user_id) REFERENCES users(user_id)
       )
     `;
 
 const checkEmployeeQuery = `SELECT * FROM employees WHERE user_id = ?`;
+
+const createProfileTableQuery = `
+      CREATE TABLE IF NOT EXISTS profile (
+        user_id VARCHAR(30) PRIMARY KEY,
+        about TEXT,
+        profession VARCHAR(255),
+        address TEXT,
+        phone VARCHAR(20),
+        plan VARCHAR(10),
+        image VARCHAR(255),
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+      );
+    `;
+
+const initializeUserProfile = `INSERT INTO profile (user_id) VALUES (?)`;
 
 module.exports = {
   checkDatabaseQuery,
@@ -37,4 +52,6 @@ module.exports = {
   findUserIdQuery,
   createEmployeesTableQuery,
   checkEmployeeQuery,
+  createProfileTableQuery,
+  initializeUserProfile,
 };

@@ -1,5 +1,10 @@
 const pool = require("../config/databaseConfig");
-const { checkDatabaseQuery, createUsersTableQuery, createEmployeesTableQuery } = require("../constants/queries");
+const {
+  checkDatabaseQuery,
+  createUsersTableQuery,
+  createEmployeesTableQuery,
+  createProfileTableQuery,
+} = require("../constants/queries");
 
 const executeQuery = async (query, values = []) => {
   let success;
@@ -46,9 +51,19 @@ const createEmployeesTable = async () => {
   }
 };
 
+const createProfileTable = async () => {
+  const res = await executeQuery(createProfileTableQuery);
+  if (res.success) {
+    console.log(`Profile Table Created Successfully`);
+  } else {
+    throw Error(res.result);
+  }
+};
+
 module.exports = {
   executeQuery,
   testConnection,
   createUsersTable,
   createEmployeesTable,
+  createProfileTable,
 };

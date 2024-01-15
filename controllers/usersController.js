@@ -2,7 +2,12 @@
 const { genHashPassword, validatePassword } = require("../utils/password");
 const { issueJWT } = require("../utils/jwt");
 const { executeQuery } = require("../utils/database");
-const { insertUserDetailsQuery, findUserEmailQuery, checkEmployeeQuery } = require("../constants/queries");
+const {
+  insertUserDetailsQuery,
+  findUserEmailQuery,
+  checkEmployeeQuery,
+  initializeUserProfile,
+} = require("../constants/queries");
 
 const genUid = (counter) => {
   // Timestamp component (YYYYMMDDHHMMSS)
@@ -58,7 +63,21 @@ const createUser = async (req, res) => {
     return res.status(501).json({ success: qreryRes.success, payload: qreryRes.result });
   }
 
-  return res.status(201).json({ success: true, payload: { message: "User Creation Successful" } });
+  // Initialize Profile Database
+  const qreryRes2 = await executeQuery(initializeUserProfile, [userId]);
+  const profileInitMessage = qreryRes2.success
+    ? {
+        profileInitializationSuccess: qreryRes2.success,
+        profilePayload: { profileMessage: "Profile Initialization Successful." },
+      }
+    : {
+        profileInitializationSuccess: qreryRes2.success,
+        profilePayload: qreryRes2.result,
+      };
+
+  return res
+    .status(201)
+    .json({ success: true, payload: { message: "User Creation Successful", ...profileInitMessage } });
 };
 
 /**
