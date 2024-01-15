@@ -41,9 +41,22 @@ const createProfileTableQuery = `
       );
     `;
 
-const initializeUserProfile = `INSERT INTO profile (user_id) VALUES (?)`;
+const initializeUserProfile = `
+  INSERT INTO profile (user_id, about, profession, address, phone, plan)
+  VALUES (?, "", "", "", "", "")
+`;
 
 const getUserProfile = `SELECT * FROM profile WHERE user_id = ?`;
+
+const updateProfileInfo = `
+    UPDATE profile
+    SET
+      about = ?,
+      profession = ?,
+      address = ?,
+      phone = ?
+    WHERE user_id = ?
+  `;
 
 module.exports = {
   checkDatabaseQuery,
@@ -56,4 +69,5 @@ module.exports = {
   createProfileTableQuery,
   initializeUserProfile,
   getUserProfile,
+  updateProfileInfo,
 };

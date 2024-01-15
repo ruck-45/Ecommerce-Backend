@@ -8,6 +8,7 @@ const {
   checkEmployeeQuery,
   initializeUserProfile,
   getUserProfile,
+  updateProfileInfo,
 } = require("../constants/queries");
 
 // ********************************** Util Functions ***********************************************
@@ -160,8 +161,42 @@ const getProfile = async (req, res) => {
   return res.status(200).json({ status: "success", payload: { ...qreryRes.result[0][0] } });
 };
 
+/**
+ *
+ * profession : maximum char - 255
+ * phone : maximum char - 20
+ *
+ */
+
+const updateProfile = async (req, res) => {
+  const userId = req.user.user_id;
+  const { about, profession, address, phone } = req.body;
+
+  // Return If Partial Information Provided
+  if (about === undefined || profession === undefined || address === undefined || phone === undefined) {
+    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+  }
+
+  // Return If Data Exceeds Length
+  if (profession.length > 255 || phone.length > 20) {
+    return res.status(406).json({ success: false, payload: { message: "Not Acceptable. Data Length Exceeds Limit" } });
+  }
+
+  // Update Profile Details In Database
+  const details = [about, profession, address, phone, userId];
+  const qreryRes = await executeQuery(updateProfileInfo, details);
+
+  // Return If Query Unsuccessful
+  if (!qreryRes.success) {
+    return res.status(501).json({ success: qreryRes.success, payload: qreryRes.result });
+  }
+
+  return res.status(200).json({ success: qreryRes.success, payload: { message: "Profile Info Successfully Updated" } });
+};
+
 module.exports = {
   createUser,
   loginUser,
   getProfile,
+  updateProfile,
 };
