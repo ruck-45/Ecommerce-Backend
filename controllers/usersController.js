@@ -7,7 +7,10 @@ const {
   findUserEmailQuery,
   checkEmployeeQuery,
   initializeUserProfile,
+  getUserProfile,
 } = require("../constants/queries");
+
+// ********************************** Util Functions ***********************************************
 
 const genUid = (counter) => {
   // Timestamp component (YYYYMMDDHHMMSS)
@@ -27,6 +30,8 @@ const genUid = (counter) => {
 
   return userId;
 };
+
+// ********************************** signup ***********************************************
 
 /**
  *
@@ -79,6 +84,8 @@ const createUser = async (req, res) => {
     .status(201)
     .json({ success: true, payload: { message: "User Creation Successful", ...profileInitMessage } });
 };
+
+// ********************************** login ***********************************************
 
 /**
  *
@@ -138,9 +145,19 @@ const loginUser = async (req, res) => {
     .json({ success: true, payload: { message: "User Authenticated Successfully", isEmployee, ...jwt } });
 };
 
-const getProfile = (req, res) => {
-  console.log(req.user);
-  res.status(200).json({ status: "success", payload: { message: "Entered into Profile Page" } });
+// ********************************** profile ***********************************************
+
+const getProfile = async (req, res) => {
+  // Get User Profile Details
+  const userId = req.user.user_id;
+  const qreryRes = await executeQuery(getUserProfile, [userId]);
+
+  // Return If Query Unsuccessful
+  if (!qreryRes.success) {
+    return res.status(501).json({ success: qreryRes.success, payload: qreryRes.result });
+  }
+
+  return res.status(200).json({ status: "success", payload: { ...qreryRes.result[0][0] } });
 };
 
 module.exports = {

@@ -8,9 +8,12 @@ const { updateRegisterCounter } = require("../middlewares/usersMiddlewares");
 
 const router = Router();
 
+// middleware
+router.use("/profile", passport.authenticate("jwt", { session: false }));
+
 // routes
 router.route("/signup").post(updateRegisterCounter, createUser);
 router.route("/login").post(loginUser);
-router.route("/profile").get(passport.authenticate("jwt", { session: false }), getProfile);
+router.route("/profile").get(getProfile);
 
 module.exports = router;

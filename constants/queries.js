@@ -37,12 +37,13 @@ const createProfileTableQuery = `
         address TEXT,
         phone VARCHAR(20),
         plan VARCHAR(10),
-        image VARCHAR(255),
         FOREIGN KEY (user_id) REFERENCES users(user_id)
       );
     `;
 
 const initializeUserProfile = `INSERT INTO profile (user_id) VALUES (?)`;
+
+const getUserProfile = `SELECT * FROM profile WHERE user_id = ?`;
 
 module.exports = {
   checkDatabaseQuery,
@@ -54,4 +55,5 @@ module.exports = {
   checkEmployeeQuery,
   createProfileTableQuery,
   initializeUserProfile,
+  getUserProfile,
 };
