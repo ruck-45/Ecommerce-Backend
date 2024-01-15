@@ -1,5 +1,5 @@
 const pool = require("../config/databaseConfig");
-const { checkDatabase, createUsersTable } = require("../constants/queries");
+const { checkDatabaseQuery, createUsersTableQuery, createEmployeesTableQuery } = require("../constants/queries");
 
 const executeQuery = async (query, values = []) => {
   let success;
@@ -20,7 +20,7 @@ const executeQuery = async (query, values = []) => {
 };
 
 const testConnection = async () => {
-  const res = await executeQuery(checkDatabase);
+  const res = await executeQuery(checkDatabaseQuery);
   if (res.success) {
     console.log(`Database Connection Successful. Test Result : ${JSON.stringify(res.result[0])}`);
   } else {
@@ -28,10 +28,19 @@ const testConnection = async () => {
   }
 };
 
-const createAuthTable = async () => {
-  const res = await executeQuery(createUsersTable);
+const createUsersTable = async () => {
+  const res = await executeQuery(createUsersTableQuery);
   if (res.success) {
     console.log(`Users Table Created Successfully`);
+  } else {
+    throw Error(res.result);
+  }
+};
+
+const createEmployeesTable = async () => {
+  const res = await executeQuery(createEmployeesTableQuery);
+  if (res.success) {
+    console.log(`Employees Table Created Successfully`);
   } else {
     throw Error(res.result);
   }
@@ -40,5 +49,6 @@ const createAuthTable = async () => {
 module.exports = {
   executeQuery,
   testConnection,
-  createAuthTable,
+  createUsersTable,
+  createEmployeesTable,
 };

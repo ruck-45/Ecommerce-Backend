@@ -2,7 +2,7 @@
 const { genHashPassword, validatePassword } = require("../utils/password");
 const { issueJWT } = require("../utils/jwt");
 const { executeQuery } = require("../utils/database");
-const { insertUserDetails, findUserEmail } = require("../constants/queries");
+const { insertUserDetailsQuery, findUserEmailQuery, checkEmployeeQuery } = require("../constants/queries");
 
 const genUid = (counter) => {
   // Timestamp component (YYYYMMDDHHMMSS)
@@ -35,12 +35,12 @@ const createUser = async (req, res) => {
 
   // Return If Partial Information Provided
   if (username === undefined || email === undefined || password === undefined) {
-    return res.status(206).json({ success: false, message: "Partial Content Provided" });
+    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
 
   // Return If Data Exceeds Length
   if (username.length > 50 || email.length > 100) {
-    return res.status(406).json({ success: false, message: "Not Acceptable. Data Length Exceeds Limit" });
+    return res.status(406).json({ success: false, payload: { message: "Not Acceptable. Data Length Exceeds Limit" } });
   }
 
   // Hash Password generation
@@ -51,14 +51,14 @@ const createUser = async (req, res) => {
 
   // Insert Into Database
   const details = [userId, username, salt, hashPassword, email];
-  const qreryRes = await executeQuery(insertUserDetails, details);
+  const qreryRes = await executeQuery(insertUserDetailsQuery, details);
 
   // Return If Creation Unsuccessful
   if (!qreryRes.success) {
-    return res.status(501).json({ success: qreryRes.success, message: qreryRes.result });
+    return res.status(501).json({ success: qreryRes.success, payload: qreryRes.result });
   }
 
-  return res.status(201).json({ success: true, message: "User Creation Successful" });
+  return res.status(201).json({ success: true, payload : {message: "User Creation Successful"} });
 };
 
 /**
@@ -73,21 +73,21 @@ const loginUser = async (req, res) => {
 
   // Return If Partial Information Provided
   if (email === undefined || remember === undefined || password === undefined) {
-    return res.status(206).json({ success: false, message: "Partial Content Provided" });
+    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
 
   // Return If Data Exceeds Length
   if (email.length > 100) {
-    return res.status(406).json({ success: false, message: "Not Acceptable. Data Length Exceeds Limit" });
+    return res.status(406).json({ success: false, payload: { message: "Not Acceptable. Data Length Exceeds Limit" } });
   }
 
   // Search User In Database
-  const qreryRes = await executeQuery(findUserEmail, [email]);
+  const qreryRes = await executeQuery(findUserEmailQuery, [email]);
   const userDetails = qreryRes.result[0];
 
   // Return If Query Unsuccessful
   if (userDetails.length === 0) {
-    return res.status(401).json({ success: false, message: "User Not Found" });
+    return res.status(401).json({ success: false, payload: { message: "User Not Found" } });
   }
 
   // Extracting user Details
@@ -100,17 +100,27 @@ const loginUser = async (req, res) => {
 
   // Return If Invalid Password
   if (!passwordValidity) {
-    return res.status(401).json({ success: false, message: "Invalid Password" });
+    return res.status(401).json({ success: false, payload: { message: "Invalid Password" } });
   }
 
   // Issue JWT
   const jwt = issueJWT(userId, remember);
 
-  return res.status(201).json({ success: true, message: { message: "User Authenticated Successfully", ...jwt } });
+  // Check If User is a registered TMIS employee
+  let isEmployee = true;
+  const qreryRes2 = await executeQuery(checkEmployeeQuery, [userId]);
+  const employeeDetails = qreryRes2.result[0];
+  if (employeeDetails.length === 0) {
+    isEmployee = false;
+  }
+
+  return res
+    .status(201)
+    .json({ success: true, payload: { message: "User Authenticated Successfully", isEmployee, ...jwt } });
 };
 
 const getProfile = (req, res) => {
-  res.status(200).json({ status: "success", message: "Entered into Profile Page" });
+  res.status(200).json({ status: "success", payload: { message: "Entered into Profile Page" } });
 };
 
 module.exports = {

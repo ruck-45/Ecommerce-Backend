@@ -5,7 +5,7 @@ const { Strategy, ExtractJwt } = require("passport-jwt");
 
 // Local Files
 const { executeQuery } = require("../utils/database");
-const { findUserId } = require("../constants/queries");
+const { findUserIdQuery } = require("../constants/queries");
 
 const pathToKey = path.join(__dirname, "..", "secrets", "rsaPubKey.pem");
 const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
@@ -17,7 +17,7 @@ const options = {
 };
 
 const strategy = new Strategy(options, (payload, done) => {
-  executeQuery(findUserId, [payload.uid])
+  executeQuery(findUserIdQuery, [payload.uid])
     .then((qreryRes) => {
       const userDetails = qreryRes.result[0];
       if (userDetails.length === 0) {
