@@ -114,7 +114,7 @@ const loginUser = async (req, res) => {
 
   // Return If Query Unsuccessful
   if (userDetails.length === 0) {
-    return res.status(401).json({ success: false, payload: { message: "User Not Found" } });
+    return res.status(404).json({ success: false, payload: { message: "User Not Found" } });
   }
 
   // Extracting user Details
@@ -135,16 +135,16 @@ const loginUser = async (req, res) => {
   const jwt = issueJWT(userId, remember);
 
   // Check If User is a registered TMIS employee
-  let isEmployee = true;
-  const qreryRes2 = await executeQuery(checkEmployeeQuery, [userId]);
-  const employeeDetails = qreryRes2.result[0];
-  if (employeeDetails.length === 0) {
-    isEmployee = false;
-  }
+  // let isEmployee = true;
+  // const qreryRes2 = await executeQuery(checkEmployeeQuery, [userId]);
+  // const employeeDetails = qreryRes2.result[0];
+  // if (employeeDetails.length === 0) {
+  //   isEmployee = false;
+  // }
 
   return res
     .status(201)
-    .json({ success: true, payload: { message: "User Authenticated Successfully", userName, isEmployee, ...jwt } });
+    .json({ success: true, payload: { message: "User Authenticated Successfully", userName, ...jwt } });
 };
 
 // ********************************** profile ***********************************************
@@ -156,7 +156,9 @@ const getProfile = async (req, res) => {
 
   // Return If Query Unsuccessful
   if (!qreryRes.success) {
-    return res.status(501).json({ success: qreryRes.success, payload: qreryRes.result });
+    return res
+      .status(404)
+      .json({ success: qreryRes.success, payload: { message: "User Data Not Found", result: qreryRes.result } });
   }
 
   return res.status(200).json({ status: "success", payload: { ...qreryRes.result[0][0] } });
@@ -197,7 +199,8 @@ const updateProfile = async (req, res) => {
 
 const updateProfileImage = (req, res) => {
   const a = 1;
-  return res.status(200).json({ ...req.body });
+  console.log(req.body);
+  return res.status(200).json({ success: "True" });
 };
 
 module.exports = {

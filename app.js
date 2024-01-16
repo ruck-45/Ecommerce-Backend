@@ -13,8 +13,8 @@ const port = process.env.PORT;
 const app = express();
 
 // Essential Middlewares
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(cors());
 
