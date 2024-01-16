@@ -121,6 +121,7 @@ const loginUser = async (req, res) => {
   const userId = userDetails[0].user_id;
   const salt = userDetails[0].password_salt;
   const hashPassword = userDetails[0].password_hash;
+  const userName = userDetails[0].username;
 
   // Validating Password
   const passwordValidity = validatePassword(password, hashPassword, salt);
@@ -143,7 +144,7 @@ const loginUser = async (req, res) => {
 
   return res
     .status(201)
-    .json({ success: true, payload: { message: "User Authenticated Successfully", isEmployee, ...jwt } });
+    .json({ success: true, payload: { message: "User Authenticated Successfully", userName, isEmployee, ...jwt } });
 };
 
 // ********************************** profile ***********************************************
@@ -194,9 +195,15 @@ const updateProfile = async (req, res) => {
   return res.status(200).json({ success: qreryRes.success, payload: { message: "Profile Info Successfully Updated" } });
 };
 
+const updateProfileImage = (req, res) => {
+  const a = 1;
+  return res.status(200).json({ ...req.body });
+};
+
 module.exports = {
   createUser,
   loginUser,
   getProfile,
   updateProfile,
+  updateProfileImage,
 };

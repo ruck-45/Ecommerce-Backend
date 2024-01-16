@@ -3,7 +3,13 @@ const express = require("express");
 const passport = require("passport");
 
 // Local Files
-const { createUser, loginUser, getProfile, updateProfile } = require("../controllers/usersController");
+const {
+  createUser,
+  loginUser,
+  getProfile,
+  updateProfile,
+  updateProfileImage,
+} = require("../controllers/usersController");
 const { updateRegisterCounter } = require("../middlewares/usersMiddlewares");
 
 const router = express.Router();
@@ -16,5 +22,6 @@ router.use("/profile/images", express.static("./public/userImages"));
 router.route("/signup").post(updateRegisterCounter, createUser);
 router.route("/login").post(loginUser);
 router.route("/profile").get(getProfile).put(updateProfile);
+router.route("/profile/images").put(updateProfileImage);
 
 module.exports = router;
