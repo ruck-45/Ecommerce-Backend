@@ -1,5 +1,6 @@
 // Dependencies
 const express = require("express");
+const path = require("path");
 const multer = require("multer");
 const passport = require("passport");
 
@@ -16,7 +17,15 @@ const { updateRegisterCounter } = require("../middlewares/usersMiddlewares");
 const router = express.Router();
 
 // multer storage setup
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "..", "public", "userImages")); // Folder where Images Are saved
+  },
+  filename: (req, file, cb) => {
+    const imageId = req.header("imageId");
+    cb(null, `${imageId}.png`); // file Name
+  },
+});
 const storeProfilePic = multer({ storage });
 
 // middleware
