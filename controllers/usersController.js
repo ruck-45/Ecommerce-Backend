@@ -1,3 +1,8 @@
+// Dependencies
+const sharp = require("sharp");
+const fs = require("fs");
+const path = require("path");
+
 // Local Files
 const { genHashPassword, validatePassword } = require("../utils/password");
 const { issueJWT } = require("../utils/jwt");
@@ -5,7 +10,7 @@ const { executeQuery } = require("../utils/database");
 const {
   insertUserDetailsQuery,
   findUserEmailQuery,
-  checkEmployeeQuery,
+  getImageId,
   initializeUserProfile,
   getUserProfile,
   updateProfileInfo,
@@ -70,7 +75,8 @@ const createUser = async (req, res) => {
   }
 
   // Initialize Profile Database
-  const qreryRes2 = await executeQuery(initializeUserProfile, [userId]);
+  const imageId = genUid(registerCounter);
+  const qreryRes2 = await executeQuery(initializeUserProfile, [userId, imageId]);
   const profileInitMessage = qreryRes2.success
     ? {
         profileInitializationSuccess: qreryRes2.success,
@@ -197,10 +203,32 @@ const updateProfile = async (req, res) => {
   return res.status(200).json({ success: qreryRes.success, payload: { message: "Profile Info Successfully Updated" } });
 };
 
-const updateProfileImage = (req, res) => {
-  const a = 1;
-  console.log(req.body);
-  return res.status(200).json({ success: "True" });
+const updateProfileImage = async (req, res) => {
+  const userId = req.user.user_id;
+
+  // Return If No File Uploaded
+  if (!req.file) {
+    return res.status(400).json({ success: false, payload: { message: "File Not Found" } });
+  }
+
+  // Convert Images to .jepg
+  const convertedImageBuffer = await sharp(req.file.buffer).toFormat("jpeg").toBuffer();
+  if (!convertedImageBuffer) {
+    return res.status(501).json({ success: false, payload: { message: "Error While Converting to .jpeg" } });
+  }
+
+  // get unique ImageId
+  const qreryRes = await executeQuery(getImageId, [userId]);
+  if (!qreryRes.success) {
+    return res.status(501).json({ success: qreryRes.success, payload: qreryRes.result });
+  }
+
+  // Store Image To FileSystem
+  const fileName = `${qreryRes.result[0][0].image}.jpeg`;
+  const filepath = path.join(__dirname, "..", "public", "userImages", fileName);
+  fs.writeFileSync(path.join(filepath), convertedImageBuffer);
+
+  return res.status(200).json({ success: true, payload: { message: "Profile Picture Updated Successfully" } });
 };
 
 module.exports = {

@@ -37,13 +37,14 @@ const createProfileTableQuery = `
         address TEXT,
         phone VARCHAR(20),
         plan VARCHAR(10),
+        image VARCHAR(50) UNIQUE,
         FOREIGN KEY (user_id) REFERENCES users(user_id)
       );
     `;
 
 const initializeUserProfile = `
-  INSERT INTO profile (user_id, about, profession, address, phone, plan)
-  VALUES (?, "", "", "", "", "")
+  INSERT INTO profile (user_id, about, profession, address, phone, plan, image)
+  VALUES (?, "", "", "", "", "", ?)
 `;
 
 const getUserProfile = `SELECT * FROM profile WHERE user_id = ?`;
@@ -58,6 +59,8 @@ const updateProfileInfo = `
     WHERE user_id = ?
   `;
 
+const getImageId = `SELECT image FROM profile WHERE user_id = ?`;
+
 module.exports = {
   checkDatabaseQuery,
   createUsersTableQuery,
@@ -70,4 +73,5 @@ module.exports = {
   initializeUserProfile,
   getUserProfile,
   updateProfileInfo,
+  getImageId,
 };
