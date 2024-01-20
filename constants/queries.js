@@ -58,6 +58,38 @@ const updateProfileInfo = `
     WHERE user_id = ?
   `;
 
+const createBlogTableQuery = `
+    CREATE TABLE IF NOT EXISTS blogs (
+      blog_id varchar(40) PRIMARY KEY ,
+      title VARCHAR(260) NOT NULL,
+      description TEXT,
+      employee_id VARCHAR(30) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (employee_id) REFERENCES employees(user_id)
+    );
+  `;
+
+const getBlogByIdQuery = `SELECT * FROM blogs WHERE blog_id = ?`;
+
+const getBlogsQuery = `SELECT * FROM blogs ORDER BY created_at DESC LIMIT 15;`;
+
+const initializeBlog = `
+  INSERT INTO blogs (blog_id, title, description, employee_id, created_at)
+  VALUES (?, ?, ?, ?, NOW())
+`;
+
+
+const createBlogsUnitTableQuery = `
+    CREATE TABLE IF NOT EXISTS blogs_unit (
+      blog_unit_id varchar(40) PRIMARY KEY ,
+      title VARCHAR(260) NOT NULL,
+      description TEXT,
+      employee_id VARCHAR(30) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (employee_id) REFERENCES employees(user_id)
+    );
+  `;
+
 module.exports = {
   checkDatabaseQuery,
   createUsersTableQuery,
@@ -70,4 +102,9 @@ module.exports = {
   initializeUserProfile,
   getUserProfile,
   updateProfileInfo,
+  createBlogTableQuery,
+  getBlogByIdQuery,
+  getBlogsQuery,
+  initializeBlog,
+  createBlogsUnitTableQuery,
 };
