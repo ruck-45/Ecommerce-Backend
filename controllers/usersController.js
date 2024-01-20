@@ -1,3 +1,7 @@
+// Dependencies
+const fs = require("fs");
+const path = require("path");
+
 // Local Files
 const { genHashPassword, validatePassword } = require("../utils/password");
 const { issueJWT } = require("../utils/jwt");
@@ -5,7 +9,7 @@ const { executeQuery } = require("../utils/database");
 const {
   insertUserDetailsQuery,
   findUserEmailQuery,
-  checkEmployeeQuery,
+  getImageId,
   initializeUserProfile,
   getUserProfile,
   updateProfileInfo,
@@ -70,7 +74,8 @@ const createUser = async (req, res) => {
   }
 
   // Initialize Profile Database
-  const qreryRes2 = await executeQuery(initializeUserProfile, [userId]);
+  const imageId = genUid(registerCounter);
+  const qreryRes2 = await executeQuery(initializeUserProfile, [userId, imageId]);
   const profileInitMessage = qreryRes2.success
     ? {
         profileInitializationSuccess: qreryRes2.success,
@@ -197,10 +202,13 @@ const updateProfile = async (req, res) => {
   return res.status(200).json({ success: qreryRes.success, payload: { message: "Profile Info Successfully Updated" } });
 };
 
-const updateProfileImage = (req, res) => {
-  const a = 1;
-  console.log(req.body);
-  return res.status(200).json({ success: "True" });
+const updateProfileImage = async (req, res) => {
+  // Return If No File Uploaded
+  if (!req.file) {
+    return res.status(400).json({ success: false, payload: { message: "File Not Found" } });
+  }
+
+  return res.status(200).json({ success: true, payload: { message: "Profile Picture Updated Successfully" } });
 };
 
 module.exports = {
