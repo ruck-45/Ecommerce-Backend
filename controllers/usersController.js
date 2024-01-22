@@ -1,7 +1,3 @@
-// Dependencies
-const fs = require("fs");
-const path = require("path");
-
 // Local Files
 const { genHashPassword, validatePassword } = require("../utils/password");
 const { issueJWT } = require("../utils/jwt");
@@ -9,10 +5,10 @@ const { executeQuery } = require("../utils/database");
 const {
   insertUserDetailsQuery,
   findUserEmailQuery,
-  getImageId,
   initializeUserProfile,
   getUserProfile,
   updateProfileInfo,
+  checkEmployeeQuery
 } = require("../constants/queries");
 
 // ********************************** Util Functions ***********************************************
@@ -139,17 +135,23 @@ const loginUser = async (req, res) => {
   // Issue JWT
   const jwt = issueJWT(userId, remember);
 
-  // Check If User is a registered TMIS employee
-  // let isEmployee = true;
-  // const qreryRes2 = await executeQuery(checkEmployeeQuery, [userId]);
-  // const employeeDetails = qreryRes2.result[0];
-  // if (employeeDetails.length === 0) {
-  //   isEmployee = false;
-  // }
+  // Check If User is a registered hms employee
+  let isEmployee = false;
+  const qreryRes2 = await executeQuery(checkEmployeeQuery, [userId]);
+  const employeeDetails = qreryRes2.result[0];
+  if (employeeDetails.length > 0) {
+    isEmployee = true;
+  }
 
-  return res
-    .status(201)
-    .json({ success: true, payload: { message: "User Authenticated Successfully", userName, ...jwt } });
+  return res.status(201).json({
+    success: true,
+    payload: {
+      message: "User Authenticated Successfully",
+      userName,
+      isEmployee, // Include the isEmployee flag in the response
+      ...jwt,
+    },
+  });
 };
 
 // ********************************** profile ***********************************************

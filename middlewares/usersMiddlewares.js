@@ -11,7 +11,6 @@ const updateRegisterCounter = (req, res, next) => {
   }
 
   req.body.registerCounter = registerCounter;
-
   next();
 };
 
