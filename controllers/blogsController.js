@@ -1,5 +1,5 @@
 const { executeQuery } = require("../utils/database");
-const {getBlogsQuery, getBlogByIdQuery, initializeBlog } = require("../constants/queries");
+const {getBlogsQuery, getBlogByIdQuery, initializeBlog, initializeMainBlog, getTotalBlogsQuery} = require("../constants/queries");
 
 
 
@@ -28,9 +28,9 @@ const genBlogid = (counter) => {
 
 
 const createBlog = async (req, res) => {
-  const { title, description, employeeId, registerCounter } = req.body;
+  const { title, summary, content,  employeeId, registerCounter } = req.body;
 
-  if (title === undefined || description === undefined) {
+  if (title === undefined || summary === undefined) {
     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
 
@@ -39,14 +39,21 @@ const createBlog = async (req, res) => {
   }
 
   const blogId = genBlogid(registerCounter);
-  const blogDetails = [blogId, title, description, employeeId];
-  const qreryRes = await executeQuery(initializeBlog, blogDetails);
-
+  const imageId = genBlogid(registerCounter);
+  const blogDetails = [blogId, title, summary, imageId, employeeId];
+  const queryRes1 = await executeQuery(initializeBlog, blogDetails);
+  
   // Return If Creation Unsuccessful
-  if (!qreryRes.success) {
-    return res.status(501).json({ success: qreryRes.success, payload: qreryRes.result });
+  if (!queryRes1.success) {
+    return res.status(501).json({ success: queryRes1.success, payload: queryRes1.result });
   }
 
+
+  const queryRes2 = await executeQuery(initializeMainBlog, [blogId, content, imageId]);
+
+  if (!queryRes2.success) {
+    return res.status(501).json({ success: queryRes2.success, payload: queryRes2.result });
+  }
 
   return res
     .status(201)
@@ -56,11 +63,8 @@ const createBlog = async (req, res) => {
 
 
 const getBlogById = async (req, res) => {
-    const blogId = req.query['blog_id'];
-    console.log(typeof blogId)
-    console.log(blogId)
+    const blogId  = req.query.id;
     const queryRes = await executeQuery(getBlogByIdQuery, [blogId]);
-    console.log(queryRes);
     // Return If Query Unsuccessful
     if (!queryRes.success) {
       return res
@@ -73,10 +77,30 @@ const getBlogById = async (req, res) => {
 
 
 const getBlogs = async (req, res) => {
-    const queryRes = await executeQuery(getBlogsQuery)
-    console.log(queryRes.result[0].length);
-    return res.status(200).json({ status: "success", payload: { result: queryRes.result[0] } });
-}
+  const start = parseInt(req.query.start, 10) || 0;
+  const end = parseInt(req.query.end, 10) || 8;
+  const blogs = await executeQuery(getTotalBlogsQuery);
+  const totalNumberOfBlogs = blogs.result[0][0].totalBlogs
+  const queryRes = await executeQuery(getBlogsQuery, [end - start, start]);
+  if (!queryRes.success) {
+    return res.status(404).json({
+      success: queryRes.success,
+      payload: { message: "Blogs Not Available", result: queryRes.result },
+    });
+  }
 
+  return res.status(200).json({
+    status: "success",
+    payload: { result: queryRes.result[0], total: totalNumberOfBlogs },
+  });
+};
 
-module.exports = { genBlogid, createBlog, getBlogById, getBlogs };
+const updateBlogImage = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, payload: { message: "File Not Found" } });
+  }
+
+  return res.status(200).json({ success: true, payload: { message: "Profile Picture Updated Successfully" } });
+};
+
+module.exports = { genBlogid, createBlog, getBlogById, getBlogs, updateBlogImage };

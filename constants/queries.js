@@ -61,35 +61,42 @@ const updateProfileInfo = `
 
 const getImageId = `SELECT image FROM profile WHERE user_id = ?`;
 
+const getTotalBlogsQuery = `SELECT COUNT(*) AS totalBlogs FROM blogs;`;
+
 const createBlogTableQuery = `
     CREATE TABLE IF NOT EXISTS blogs (
       blog_id varchar(40) PRIMARY KEY ,
       title VARCHAR(260) NOT NULL,
-      description TEXT,
-      employee_id VARCHAR(30) NOT NULL,
+      summary VARCHAR(260) NOT NULL,
+      image VARCHAR(50) UNIQUE,
+      user_id VARCHAR(30) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (employee_id) REFERENCES employees(user_id)
+      FOREIGN KEY (user_id) REFERENCES users(user_id)
     );
   `;
 
-const getBlogByIdQuery = `SELECT * FROM blogs WHERE blog_id = ?`;
 
-const getBlogsQuery = `SELECT * FROM blogs ORDER BY created_at DESC LIMIT 15;`;
+const getBlogsQuery = `SELECT blog_id, title, summary, image, created_at FROM blogs ORDER BY created_at DESC LIMIT ? OFFSET ?;`;
+
+const getBlogByIdQuery = `SELECT content FROM mainblogs WHERE blog_id = ?`;
 
 const initializeBlog = `
-  INSERT INTO blogs (blog_id, title, description, employee_id, created_at)
-  VALUES (?, ?, ?, ?, NOW())
-`;
+  INSERT INTO blogs (blog_id, title, summary, image, user_id, created_at)
+  VALUES (?, ?, ?, ?, ?, NOW())
+`;  
 
 
-const createBlogsUnitTableQuery = `
-    CREATE TABLE IF NOT EXISTS blogs_unit (
-      blog_unit_id varchar(40) PRIMARY KEY ,
-      title VARCHAR(260) NOT NULL,
-      description TEXT,
-      employee_id VARCHAR(30) NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (employee_id) REFERENCES employees(user_id)
+const initializeMainBlog = `
+  INSERT INTO mainblogs (blog_id, content, image)
+  VALUES (?, ?, ?)
+  `;
+
+const createMainBlogsTableQuery = `
+    CREATE TABLE IF NOT EXISTS mainBlogs (
+      blog_id varchar(40) PRIMARY KEY,
+      content TEXT,
+      image VARCHAR(40),
+      FOREIGN KEY (blog_id) REFERENCES blogs(blog_id)
     );
   `;
 
@@ -105,4 +112,12 @@ module.exports = {
   initializeUserProfile,
   getUserProfile,
   updateProfileInfo,
+  createBlogTableQuery,
+  getBlogByIdQuery,
+  getBlogsQuery,
+  initializeBlog,
+  createMainBlogsTableQuery,
+  getImageId,
+  getTotalBlogsQuery,
+  initializeMainBlog,
 };

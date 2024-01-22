@@ -15,6 +15,15 @@ const updateRegisterCounter = (req, res, next) => {
   next();
 };
 
+const ensureEmployee= (req, res, next) => {
+  if (req.isAuthenticated() && req.user.isEmployee) {
+    return next();
+  }   
+  return res.status(403).send("Unauthorized");
+}
+
+
 module.exports = {
   updateRegisterCounter,
+  ensureEmployee,
 };

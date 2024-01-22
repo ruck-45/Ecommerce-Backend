@@ -7,7 +7,7 @@ const passport = require("passport");
 // Local Files
 const users = require("./routes/users");
 const blogs = require("./routes/blogs");
-const { testConnection, createUsersTable, createEmployeesTable, createProfileTable, createBlogTable } = require("./utils/database");
+const { testConnection, createUsersTable, createEmployeesTable, createProfileTable, createBlogTable, mainBlogTable } = require("./utils/database");
 require("./config/passportConfig")(passport);
 
 const port = process.env.PORT;
@@ -21,7 +21,7 @@ app.use(cors());
 
 // Routes
 app.use("/api/users", users);
-app.use("/api/blogs/", blogs);
+app.use("/api/blogs", blogs);
 
 // Database Connection and Configuration
 testConnection();
@@ -29,6 +29,8 @@ createUsersTable();
 createEmployeesTable();
 createProfileTable();
 createBlogTable();
+mainBlogTable();
+
 
 app.listen(port, () => {
   console.log("Server Listening on PORT:", port);
