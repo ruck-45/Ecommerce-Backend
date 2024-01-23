@@ -74,7 +74,7 @@ const getBlogById = async (req, res) => {
       .json({ success: queryRes.success, payload: { message: "Blog Not Found", result: queryRes.result } });
   }
 
-  return res.status(200).json({ success: true, payload: { result: queryRes.result[0] } });
+  return res.status(200).json({ success: true, payload: { result: queryRes.result[0][0].content } });
 };
 
 const getBlogs = async (req, res) => {

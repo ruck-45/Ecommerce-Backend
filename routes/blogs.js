@@ -26,8 +26,8 @@ const storeBlogImage = multer({ storage: blogStorage });
 router.use("/blogImages", express.static("./public/blogImages"));
 
 // routes
+router.route("/latest").get(getBlogs);
 router.route("/:blogId").get(getBlogById);
-router.route("/getBlogs").get(getBlogs);
 router
   .route("/create")
   .post(passport.authenticate("jwt", { session: false }), ensureEmployee, updateBlogCounter, createBlog);
