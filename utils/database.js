@@ -5,7 +5,7 @@ const {
   createEmployeesTableQuery,
   createProfileTableQuery,
   createBlogTableQuery,
-  createMainBlogsTableQuery
+  createBlogContentTableQuery,
 } = require("../constants/queries");
 
 const executeQuery = async (query, values = []) => {
@@ -69,17 +69,16 @@ const createBlogTable = async () => {
   } else {
     throw Error(res.result);
   }
-}
+};
 
-const mainBlogTable = async () => {
-  const res = await executeQuery(createMainBlogsTableQuery);
+const blogContentTable = async () => {
+  const res = await executeQuery(createBlogContentTableQuery);
   if (res.success) {
-    console.log(`Main Blog Table Created Successfully`);
+    console.log(`Blog Content Table Created Successfully`);
   } else {
     throw Error(res.result);
   }
 };
-
 
 module.exports = {
   executeQuery,
@@ -88,5 +87,5 @@ module.exports = {
   createEmployeesTable,
   createProfileTable,
   createBlogTable,
-  mainBlogTable,
+  blogContentTable,
 };

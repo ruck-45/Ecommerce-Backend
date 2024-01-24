@@ -2,12 +2,11 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-
-// const passport = require("passport");
+const passport = require("passport");
 
 // Local Files
 const { createBlog, getBlogById, getBlogs, updateBlogImage } = require("../controllers/blogsController");
-const { updateRegisterCounter } = require("../middlewares/blogsMiddlewares");
+const { updateBlogCounter, ensureEmployee } = require("../middlewares/blogsMiddlewares");
 
 const router = express.Router();
 
@@ -22,14 +21,23 @@ const blogStorage = multer.diskStorage({
   },
 });
 const storeBlogImage = multer({ storage: blogStorage });
+
 // middleware
 router.use("/blogImages", express.static("./public/blogImages"));
 
 // routes
-router.route("/blog").get(getBlogById); 
-router.route("/ourBlogs").get(getBlogs);
-router.route("/create-blog").post(updateRegisterCounter, createBlog);
-router.route("/blogImages").post(storeBlogImage.single("image"), updateBlogImage);
-
+router.route("/latest").get(getBlogs);
+router.route("/:blogId").get(getBlogById);
+router
+  .route("/create")
+  .post(passport.authenticate("jwt", { session: false }), ensureEmployee, updateBlogCounter, createBlog);
+router
+  .route("/blogImages")
+  .post(
+    passport.authenticate("jwt", { session: false }),
+    ensureEmployee,
+    storeBlogImage.single("image"),
+    updateBlogImage
+  );
 
 module.exports = router;

@@ -1,29 +1,37 @@
-let lastResetDate = new Date().getUTCDate();
-let registerCounter = 0;
+// Local Files
+const { checkEmployeeQuery } = require("../constants/queries");
+const { executeQuery } = require("../utils/database");
 
-const updateRegisterCounter = (req, res, next) => {
-  registerCounter += 1;
+let lastResetDate = new Date().getUTCDate();
+let blogCounter = 0;
+
+const updateBlogCounter = (req, res, next) => {
+  blogCounter += 1;
   const currentDay = new Date().getUTCDate();
 
   if (currentDay !== lastResetDate) {
-    registerCounter = 1;
+    blogCounter = 1;
     lastResetDate = currentDay;
   }
 
-  req.body.registerCounter = registerCounter;
+  req.body.blogCounter = blogCounter;
 
   next();
 };
 
-const ensureEmployee= (req, res, next) => {
-  if (req.isAuthenticated() && req.user.isEmployee) {
-    return next();
-  }   
-  return res.status(403).send("Unauthorized");
-}
+const ensureEmployee = async (req, res, next) => {
+  const userId = req.user.user_id;
 
+  const qreryRes2 = await executeQuery(checkEmployeeQuery, [userId]);
+  const employeeDetails = qreryRes2.result[0];
+  if (employeeDetails.length === 0) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  next();
+};
 
 module.exports = {
-  updateRegisterCounter,
+  updateBlogCounter,
   ensureEmployee,
 };
