@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 // Local Files
 const { genHashPassword, validatePassword } = require("../utils/password");
 const { issueJWT } = require("../utils/jwt");
@@ -72,15 +75,32 @@ const createUser = async (req, res) => {
   // Initialize Profile Database
   const imageId = genUid(registerCounter);
   const qreryRes2 = await executeQuery(initializeUserProfile, [userId, imageId]);
-  const profileInitMessage = qreryRes2.success
-    ? {
-        profileInitializationSuccess: qreryRes2.success,
-        profilePayload: { profileMessage: "Profile Initialization Successful." },
-      }
-    : {
-        profileInitializationSuccess: qreryRes2.success,
-        profilePayload: qreryRes2.result,
-      };
+  let profileInitMessage = {}
+ if (qreryRes2.success) {
+   // Profile Initialization Successful
+   const defaultImageFilename = "default.jpg";
+   const userImageFilename = `${imageId}.jpg`;
+
+   const defaultImagePath = path.join(__dirname, "../public", "userImages", defaultImageFilename);
+   const userImagePath = path.join(__dirname, "../public", "userImages", userImageFilename);
+
+   // Read the contents of the default image file
+   const defaultImageBuffer = fs.readFileSync(defaultImagePath);
+
+   // Write the contents to the user's folder with the user-specific filename
+   fs.writeFileSync(userImagePath, defaultImageBuffer);
+
+   profileInitMessage = {
+     profileInitializationSuccess: true,
+     profilePayload: { profileMessage: "Profile Initialization Successful." },
+   };
+ } else {
+   // Profile Initialization Failed
+   profileInitMessage = {
+     profileInitializationSuccess: false,
+     profilePayload: qreryRes2.result,
+   };
+ }
 
   return res
     .status(201)

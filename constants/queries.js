@@ -59,7 +59,42 @@ const updateProfileInfo = `
     WHERE user_id = ?
   `;
 
-const getImageId = `SELECT image FROM profile WHERE user_id = ?`;
+const getTotalBlogsQuery = `SELECT COUNT(*) AS totalBlogs FROM blogs`;
+
+const createBlogTableQuery = `
+    CREATE TABLE IF NOT EXISTS blogs (
+      blog_id varchar(40) PRIMARY KEY ,
+      title VARCHAR(100) NOT NULL,
+      summary VARCHAR(260) NOT NULL,
+      image VARCHAR(50) UNIQUE,
+      user_id VARCHAR(30) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(user_id)
+    );
+  `;
+
+const getBlogsQuery = `SELECT blog_id, title, summary, image, created_at FROM blogs ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+
+const getBlogByIdQuery = `SELECT content FROM blog_content WHERE blog_id = ?`;
+
+const initializeBlog = `
+  INSERT INTO blogs (blog_id, title, summary, image, user_id, created_at)
+  VALUES (?, ?, ?, ?, ?, NOW())
+`;
+
+const initializeBlogContent = `
+  INSERT INTO blog_content (blog_id, content)
+  VALUES (?, ?)
+  `;
+
+const createBlogContentTableQuery = `
+    CREATE TABLE IF NOT EXISTS blog_content (
+      blog_id varchar(40) PRIMARY KEY,
+      content JSON,
+      FOREIGN KEY (blog_id) REFERENCES blogs(blog_id)
+    );
+  `;
+
 
 module.exports = {
   checkDatabaseQuery,
