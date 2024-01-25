@@ -95,6 +95,7 @@ const createBlogContentTableQuery = `
     );
   `;
 
+
 module.exports = {
   checkDatabaseQuery,
   createUsersTableQuery,
