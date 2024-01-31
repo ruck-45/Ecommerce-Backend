@@ -6,6 +6,7 @@ const {
   createProfileTableQuery,
   createBlogTableQuery,
   createBlogContentTableQuery,
+  updateQuery,
 } = require("../constants/queries");
 
 const executeQuery = async (query, values = []) => {
@@ -79,6 +80,7 @@ const blogContentTable = async () => {
     throw Error(res.result);
   }
 };
+
 
 module.exports = {
   executeQuery,

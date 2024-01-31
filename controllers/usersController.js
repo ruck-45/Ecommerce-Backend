@@ -11,8 +11,11 @@ const {
   initializeUserProfile,
   getUserProfile,
   updateProfileInfo,
-  checkEmployeeQuery
+  checkEmployeeQuery,
+  changePassword,
 } = require("../constants/queries");
+
+const { sendEmail } = require("../utils/sendmail");
 
 // ********************************** Util Functions ***********************************************
 
@@ -153,7 +156,7 @@ const loginUser = async (req, res) => {
   }
 
   // Issue JWT
-  const jwt = issueJWT(userId, remember);
+ const jwt = issueJWT(userId, remember ? 7 : 1, "d");
 
   // Check If User is a registered hms employee
   let isEmployee = false;
@@ -233,10 +236,66 @@ const updateProfileImage = async (req, res) => {
   return res.status(200).json({ success: true, payload: { message: "Profile Picture Updated Successfully" } });
 };
 
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body; 
+    if (email === undefined) {
+      return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+    }
+
+    const qreryRes = await executeQuery(findUserEmailQuery, [email]);
+    const userDetails = qreryRes.result[0];
+    if (userDetails.length === 0) {
+      return res.status(404).json({ success: false, payload: { message: "User Not Found" } });
+    }
+
+    const userId = userDetails[0].user_id;
+
+    const { token } = issueJWT(userId, 10, "m");
+    const resetPasswordURL = `https://hmsfreedom.com/ResetPassword?state=reset&&token=${token}`;
+    const linkText = "Click here";
+    const linkElement = `<a href="${resetPasswordURL}">${linkText}</a>`;
+    const subject = "Kreative Machinez reset password";
+    const message = `you can reset your password here :  ${linkElement}`;
+    await sendEmail(email, subject, message);
+    res.status(200).json({
+      success: true,
+      payload: { message: `reset password token sent to mail id ${email} succesfully` },
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      payload: { message: error },
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const userId = req.user.user_id;
+  const { password } = req.body;
+   if (password === undefined) {
+     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+   }
+  const { salt, hashPassword } = genHashPassword(password);
+
+  const details = [salt, hashPassword, userId];
+  const queryResult = await executeQuery(changePassword, details);
+
+  if (!queryResult.success) {
+    return res.status(501).json({ success: false, payload: queryResult.result });
+  }
+
+  return res.status(201).json({ success: true, payload: { message: "Password changed successfully." } });
+};
+
+
 module.exports = {
   createUser,
   loginUser,
   getProfile,
   updateProfile,
   updateProfileImage,
+  forgotPassword,
+  resetPassword
 };

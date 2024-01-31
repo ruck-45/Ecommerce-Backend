@@ -17,7 +17,7 @@ const {
 } = require("./utils/database");
 require("./config/passportConfig")(passport);
 
-const port = process.env.PORT;
+const port = process.env.PORT ;
 const app = express();
 
 // Essential Middlewares
