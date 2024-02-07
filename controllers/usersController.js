@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 // Local Files
 const { genHashPassword, validatePassword } = require("../utils/password");
@@ -13,6 +13,8 @@ const {
   updateProfileInfo,
   checkEmployeeQuery,
   changePassword,
+  deleteUserQuery,
+  getImageId,
 } = require("../constants/queries");
 
 const { sendEmail } = require("../utils/sendmail");
@@ -78,32 +80,32 @@ const createUser = async (req, res) => {
   // Initialize Profile Database
   const imageId = genUid(registerCounter);
   const qreryRes2 = await executeQuery(initializeUserProfile, [userId, imageId]);
-  let profileInitMessage = {}
- if (qreryRes2.success) {
-   // Profile Initialization Successful
-   const defaultImageFilename = "default.jpg";
-   const userImageFilename = `${imageId}.jpg`;
+  let profileInitMessage = {};
+  if (qreryRes2.success) {
+    // Profile Initialization Successful
+    const defaultImageFilename = "default.jpg";
+    const userImageFilename = `${imageId}.jpg`;
 
-   const defaultImagePath = path.join(__dirname, "../public", "userImages", defaultImageFilename);
-   const userImagePath = path.join(__dirname, "../public", "userImages", userImageFilename);
+    const defaultImagePath = path.join(__dirname, "../public", "userImages", defaultImageFilename);
+    const userImagePath = path.join(__dirname, "../public", "userImages", userImageFilename);
 
-   // Read the contents of the default image file
-   const defaultImageBuffer = fs.readFileSync(defaultImagePath);
+    // Read the contents of the default image file
+    const defaultImageBuffer = fs.readFileSync(defaultImagePath);
 
-   // Write the contents to the user's folder with the user-specific filename
-   fs.writeFileSync(userImagePath, defaultImageBuffer);
+    // Write the contents to the user's folder with the user-specific filename
+    fs.writeFileSync(userImagePath, defaultImageBuffer);
 
-   profileInitMessage = {
-     profileInitializationSuccess: true,
-     profilePayload: { profileMessage: "Profile Initialization Successful." },
-   };
- } else {
-   // Profile Initialization Failed
-   profileInitMessage = {
-     profileInitializationSuccess: false,
-     profilePayload: qreryRes2.result,
-   };
- }
+    profileInitMessage = {
+      profileInitializationSuccess: true,
+      profilePayload: { profileMessage: "Profile Initialization Successful." },
+    };
+  } else {
+    // Profile Initialization Failed
+    profileInitMessage = {
+      profileInitializationSuccess: false,
+      profilePayload: qreryRes2.result,
+    };
+  }
 
   return res
     .status(201)
@@ -156,7 +158,7 @@ const loginUser = async (req, res) => {
   }
 
   // Issue JWT
- const jwt = issueJWT(userId, remember ? 7 : 1, "d");
+  const jwt = issueJWT(userId, remember ? 7 : 1, "d");
 
   // Check If User is a registered hms employee
   let isEmployee = false;
@@ -236,10 +238,9 @@ const updateProfileImage = async (req, res) => {
   return res.status(200).json({ success: true, payload: { message: "Profile Picture Updated Successfully" } });
 };
 
-
 const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body; 
+    const { email } = req.body;
     if (email === undefined) {
       return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
     }
@@ -274,9 +275,9 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
   const userId = req.user.user_id;
   const { password } = req.body;
-   if (password === undefined) {
-     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
-   }
+  if (password === undefined) {
+    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+  }
   const { salt, hashPassword } = genHashPassword(password);
 
   const details = [salt, hashPassword, userId];
@@ -289,6 +290,27 @@ const resetPassword = async (req, res) => {
   return res.status(201).json({ success: true, payload: { message: "Password changed successfully." } });
 };
 
+const deleteUser = async (req, res) => {
+  const userId = req.user.user_id;
+  const imageIdRes = await executeQuery(getImageId, [userId]);
+  if (!imageIdRes.success) {
+    return res.status(404).json({ success: false, payload: { message: "User Image Not Found " } });
+  }
+  const imageId = imageIdRes.result[0][0].image;
+  const imagePath = path.join(__dirname, "..", "public", "userImages", `${imageId}.jpg`);
+  fs.unlinkSync(imagePath);
+  const deleteProfileQuery = await executeQuery(deleteUserQuery[0], [userId]);
+  if (!deleteProfileQuery.success) {
+    return res.status(404).json({ success: false, payload: { message: "User Profile Not Deleted." } });
+  }
+
+  const deleteUserRes = await executeQuery(deleteUserQuery[1], [userId]);
+  if (!deleteUserRes.success) {
+    return res.status(404).json({ success: false, payload: { message: "User Not deleted." } });
+  }
+
+  return res.status(200).json({ success: true, payload: { message: "User Deleted Successfully" } });
+};
 
 module.exports = {
   createUser,
@@ -297,5 +319,6 @@ module.exports = {
   updateProfile,
   updateProfileImage,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  deleteUser,
 };

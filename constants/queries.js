@@ -97,6 +97,9 @@ const createBlogContentTableQuery = `
     );
   `;
 
+const deleteUserQuery = [`DELETE FROM profile WHERE user_id = ?;`, `DELETE FROM users WHERE user_id = ?;` ];
+
+const getImageId = `SELECT image FROM profile WHERE user_id = ?`;
 
 module.exports = {
   checkDatabaseQuery,
@@ -118,4 +121,6 @@ module.exports = {
   getTotalBlogsQuery,
   initializeBlogContent,
   changePassword,
+  deleteUserQuery,
+  getImageId,
 };
