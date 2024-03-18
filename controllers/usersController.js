@@ -14,8 +14,6 @@ const {
   updateProfileInfo,
   checkEmployeeQuery,
   changePassword,
-  deleteUserQuery,
-  getImageId,
 } = require("../constants/queries");
 
 const { sendEmail } = require("../utils/sendmail");
@@ -284,28 +282,6 @@ const resetPassword = async (req, res) => {
   return res.status(201).json({ success: true, payload: { message: "Password changed successfully." } });
 };
 
-const deleteUser = async (req, res) => {
-  const userId = req.user.user_id;
-  const imageIdRes = await executeQuery(getImageId, [userId]);
-  if (!imageIdRes.success) {
-    return res.status(404).json({ success: false, payload: { message: "User Image Not Found " } });
-  }
-  const imageId = imageIdRes.result[0][0].image;
-  const imagePath = path.join(__dirname, "..", "public", "userImages", `${imageId}.jpg`);
-  fs.unlinkSync(imagePath);
-  const deleteProfileQuery = await executeQuery(deleteUserQuery[0], [userId]);
-  if (!deleteProfileQuery.success) {
-    return res.status(404).json({ success: false, payload: { message: "User Profile Not Deleted." } });
-  }
-
-  const deleteUserRes = await executeQuery(deleteUserQuery[1], [userId]);
-  if (!deleteUserRes.success) {
-    return res.status(404).json({ success: false, payload: { message: "User Not deleted." } });
-  }
-
-  return res.status(200).json({ success: true, payload: { message: "User Deleted Successfully" } });
-};
-
 module.exports = {
   createUser,
   loginUser,
@@ -314,5 +290,4 @@ module.exports = {
   updateProfileImage,
   forgotPassword,
   resetPassword,
-  deleteUser,
 };
