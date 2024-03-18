@@ -122,6 +122,7 @@ const createUser = async (req, res) => {
  */
 
 const loginUser = async (req, res) => {
+  console.log("start login");
   const { email, password, remember } = req.body;
 
   // Return If Partial Information Provided

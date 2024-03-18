@@ -7,6 +7,7 @@ const createUsersTableQuery = `
         password_salt VARCHAR(64) NOT NULL,
         password_hash VARCHAR(128) NOT NULL,
         email VARCHAR(100) UNIQUE NOT NULL,
+        address TEXT,
         registration_date DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `;
