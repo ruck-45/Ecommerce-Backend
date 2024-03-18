@@ -1,3 +1,4 @@
+require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 
@@ -78,13 +79,12 @@ const createUser = async (req, res) => {
   }
 
   // Initialize Profile Database
-  const imageId = genUid(registerCounter);
-  const qreryRes2 = await executeQuery(initializeUserProfile, [userId, imageId]);
+  const qreryRes2 = await executeQuery(initializeUserProfile, [userId]);
   let profileInitMessage = {};
   if (qreryRes2.success) {
     // Profile Initialization Successful
     const defaultImageFilename = "default.jpg";
-    const userImageFilename = `${imageId}.jpg`;
+    const userImageFilename = `${userId}.jpg`;
 
     const defaultImagePath = path.join(__dirname, "../public", "userImages", defaultImageFilename);
     const userImagePath = path.join(__dirname, "../public", "userImages", userImageFilename);
@@ -122,7 +122,6 @@ const createUser = async (req, res) => {
  */
 
 const loginUser = async (req, res) => {
-  console.log("start login");
   const { email, password, remember } = req.body;
 
   // Return If Partial Information Provided
@@ -174,6 +173,7 @@ const loginUser = async (req, res) => {
     payload: {
       message: "User Authenticated Successfully",
       userName,
+      userId,
       isEmployee, // Include the isEmployee flag in the response
       ...jwt,
     },
@@ -196,13 +196,6 @@ const getProfile = async (req, res) => {
 
   return res.status(200).json({ status: "success", payload: { ...qreryRes.result[0][0] } });
 };
-
-/**
- *
- * profession : maximum char - 255
- * phone : maximum char - 20
- *
- */
 
 const updateProfile = async (req, res) => {
   const userId = req.user.user_id;
@@ -255,10 +248,10 @@ const forgotPassword = async (req, res) => {
     const userId = userDetails[0].user_id;
 
     const { token } = issueJWT(userId, 10, "m");
-    const resetPasswordURL = `https://hmsfreedom.com/ResetPassword?state=reset&&token=${token}`;
+    const resetPasswordURL = `${process.env.FRONTEND_URL}/ResetPassword?state=reset&&token=${token}`;
     const linkText = "Click here";
     const linkElement = `<a href="${resetPasswordURL}">${linkText}</a>`;
-    const subject = "Kreative Machinez reset password";
+    const subject = "ShopNest reset password";
     const message = `you can reset your password here :  ${linkElement}`;
     await sendEmail(email, subject, message);
     res.status(200).json({

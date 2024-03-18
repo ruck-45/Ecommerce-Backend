@@ -40,14 +40,13 @@ const createProfileTableQuery = `
         address TEXT,
         phone VARCHAR(20),
         plan VARCHAR(10),
-        image VARCHAR(50) UNIQUE,
         FOREIGN KEY (user_id) REFERENCES users(user_id)
       );
     `;
 
 const initializeUserProfile = `
-  INSERT INTO profile (user_id, about, profession, address, phone, plan, image)
-  VALUES (?, "", "", "", "", "", ?)
+  INSERT INTO profile (user_id, about, profession, address, phone, plan)
+  VALUES (?, "", "", "", "", "")
 `;
 
 const getUserProfile = `SELECT * FROM profile WHERE user_id = ?`;
@@ -98,7 +97,7 @@ const createBlogContentTableQuery = `
     );
   `;
 
-const deleteUserQuery = [`DELETE FROM profile WHERE user_id = ?;`, `DELETE FROM users WHERE user_id = ?;` ];
+const deleteUserQuery = [`DELETE FROM profile WHERE user_id = ?;`, `DELETE FROM users WHERE user_id = ?;`];
 
 const getImageId = `SELECT image FROM profile WHERE user_id = ?`;
 
