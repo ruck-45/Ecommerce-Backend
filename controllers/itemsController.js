@@ -21,7 +21,7 @@ const genItemsId = (counter) => {
 
 const getItems = async (req, res) => {
   const start = parseInt(req.query.start, 10) || 0;
-  const end = parseInt(req.query.end, 10) || 8;
+  const end = parseInt(req.query.end, 10) || 16;
 
   if (start >= end) {
     return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
@@ -43,7 +43,7 @@ const getItems = async (req, res) => {
 
 const getItemById = async (req, res) => {
   const { itemId } = req.params;
-  console.log(itemId);
+
   if (itemId === undefined) {
     return res.status(400).json({ success: false, payload: { message: "bad request" } });
   }
