@@ -244,7 +244,6 @@ const forgotPassword = async (req, res) => {
     }
 
     const userId = userDetails[0].user_id;
-
     const { token } = issueJWT(userId, 10, "m");
     const resetPasswordURL = `${process.env.FRONTEND_URL}/ResetPassword?state=reset&&token=${token}`;
     const linkText = "Click here";

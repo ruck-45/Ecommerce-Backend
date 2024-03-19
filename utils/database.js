@@ -6,7 +6,7 @@ const {
   createProfileTableQuery,
   createBlogTableQuery,
   createBlogContentTableQuery,
-  updateQuery,
+  createItemsTableQuery,
 } = require("../constants/queries");
 
 const executeQuery = async (query, values = []) => {
@@ -81,6 +81,15 @@ const blogContentTable = async () => {
   }
 };
 
+const createItemsTable = async () => {
+  const res = await executeQuery(createItemsTableQuery);
+  if (res.success) {
+    console.log(`Items Table Created Successfully`);
+  } else {
+    throw Error(res.result);
+  }
+};
+
 
 module.exports = {
   executeQuery,
@@ -90,4 +99,5 @@ module.exports = {
   createProfileTable,
   createBlogTable,
   blogContentTable,
+  createItemsTable,
 };

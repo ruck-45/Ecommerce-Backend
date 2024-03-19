@@ -33,6 +33,28 @@ const createProfileTableQuery = `
       );
     `;
 
+const createItemsTableQuery = `
+      CREATE TABLE IF NOT EXISTS items (
+        item_id VARCHAR(30) PRIMARY KEY,
+        imageUrl JSON,
+        brand VARCHAR(100),
+        title VARCHAR(255),
+        color VARCHAR(50),
+        discountedPrice INT,
+        price INT,
+        discountPercent INT,
+        quantity INT,
+        material JSON,
+        dimensions JSON,
+        description TEXT,
+        topLevelCategory VARCHAR(100),
+        secondLevelCategory VARCHAR(100),
+        thirdLevelCategory VARCHAR(100),
+        orderQuantity INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
 const createBlogTableQuery = `
     CREATE TABLE IF NOT EXISTS blogs (
       blog_id varchar(40) PRIMARY KEY ,
@@ -101,7 +123,13 @@ const getTotalBlogsQuery = `SELECT COUNT(*) AS totalBlogs FROM blogs`;
 
 const getBlogsQuery = `SELECT blog_id, title, summary, image, created_at FROM blogs ORDER BY created_at DESC LIMIT ? OFFSET ?`;
 
+const getItemsQuery = `SELECT item_id, imageUrl, brand, title, color, discountedPrice, price  FROM items LIMIT ? OFFSET ?`;
+
 const getBlogByIdQuery = `SELECT content FROM blog_content WHERE blog_id = ?`;
+
+const getItemByIdQuery = `SELECT * FROM items WHERE item_id = ?`;
+
+const getTotalItemsQuery = `SELECT COUNT(*) AS totalItems FROM items`;
 
 module.exports = {
   checkDatabaseQuery,
@@ -123,4 +151,8 @@ module.exports = {
   getTotalBlogsQuery,
   initializeBlogContent,
   changePassword,
+  createItemsTableQuery,
+  getTotalItemsQuery,
+  getItemsQuery,
+  getItemByIdQuery,
 };
