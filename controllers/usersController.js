@@ -192,7 +192,7 @@ const getProfile = async (req, res) => {
       .json({ success: qreryRes.success, payload: { message: "User Data Not Found", result: qreryRes.result } });
   }
 
-  return res.status(200).json({ status: "success", payload: { ...qreryRes.result[0][0] } });
+  return res.status(200).json({ success: true, payload: { ...qreryRes.result[0][0] } });
 };
 
 const updateProfile = async (req, res) => {

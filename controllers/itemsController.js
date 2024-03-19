@@ -47,9 +47,7 @@ const getItems = async (req, res) => {
   const colorFilter = req.query.color;
   const newArrivalFilter = req.query.newArrival;
   const popularFilter = req.query.popular;
-  const topLevelCategoryFilter = req.query.topLevelCategory;
-  const secondLevelCategoryFilter = req.query.secondLevelCategory;
-  const thirdLevelCategoryFilter = req.query.thirdLevelCategory;
+  const categoryFilter = req.query.category;
 
   if (start >= end) {
     return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
@@ -58,25 +56,14 @@ const getItems = async (req, res) => {
   let getItemsQuery = `SELECT * FROM items WHERE 1=1 `;
   let countQuery = "SELECT COUNT(*) AS totalItems FROM items WHERE 1=1";
 
-
   if (colorFilter && colorFilter !== "All") {
     getItemsQuery += ` AND color LIKE  '%${colorFilter}%'`;
     countQuery += ` AND color LIKE  '%${colorFilter}%'`;
   }
 
-  if (topLevelCategoryFilter && topLevelCategoryFilter !== "All") {
-    getItemsQuery += ` AND topLevelCategory LIKE  '%${topLevelCategoryFilter}%'`;
-    countQuery += ` AND topLevelCategory LIKE  '%${topLevelCategoryFilter}%'`;
-  }
-
-  if (secondLevelCategoryFilter && secondLevelCategoryFilter !== "All") {
-    getItemsQuery += ` AND secondLevelCategory LIKE  '%${secondLevelCategoryFilter}%'`;
-    countQuery += ` AND secondLevelCategory LIKE  '%${secondLevelCategoryFilter}%'`;
-  }
-
-  if (thirdLevelCategoryFilter && thirdLevelCategoryFilter !== "All") {
-    getItemsQuery += ` AND thirdLevelCategory LIKE  '%${thirdLevelCategoryFilter}%'`;
-    countQuery += ` AND thirdLevelCategory LIKE  '%${thirdLevelCategoryFilter}%'`;
+  if (categoryFilter && categoryFilter !== "All") {
+    getItemsQuery += ` AND topLevelCategory LIKE  '%${categoryFilter}%' OR secondLevelCategory LIKE '%${categoryFilter}%' OR thirdLevelCategory LIKE '%${categoryFilter}%'`;
+    countQuery += ` AND topLevelCategory LIKE  '%${categoryFilter}%' OR secondLevelCategory LIKE '%${categoryFilter}%' OR thirdLevelCategory LIKE '%${categoryFilter}%'`;
   }
 
   if (newArrivalFilter) {
@@ -89,7 +76,7 @@ const getItems = async (req, res) => {
 
   getItemsQuery += ` LIMIT ${end} OFFSET ${start}`;
 
-  console.log("getItemsQuery", getItemsQuery)
+  console.log("getItemsQuery", getItemsQuery);
   const items = await executeQuery(getItemsQuery);
   if (!items.success) {
     return res.status(404).json({
@@ -109,7 +96,7 @@ const getItems = async (req, res) => {
   const totalNumberOfItems = totalItems.result[0][0].totalItems;
   return res.status(200).json({
     success: true,
-    payload: {message: "Items fetched Successful", result: items.result[0], total: totalNumberOfItems },
+    payload: { message: "Items fetched Successful", result: items.result[0], total: totalNumberOfItems },
   });
 };
 
@@ -129,6 +116,5 @@ const getItemById = async (req, res) => {
 
   return res.status(200).json({ success: true, payload: { result: queryRes.result[0][0] } });
 };
-
 
 module.exports = { genItemsId, getItems, getItemById };
