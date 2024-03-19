@@ -197,20 +197,20 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   const userId = req.user.user_id;
-  const { about, profession, address, phone } = req.body;
+  const { phone, address, state, addressCode } = req.body;
 
   // Return If Partial Information Provided
-  if (about === undefined || profession === undefined || address === undefined || phone === undefined) {
+  if (phone === undefined || address === undefined || state === undefined || addressCode === undefined) {
     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
 
   // Return If Data Exceeds Length
-  if (profession.length > 255 || phone.length > 20) {
+  if (phone.length > 20) {
     return res.status(406).json({ success: false, payload: { message: "Not Acceptable. Data Length Exceeds Limit" } });
   }
 
   // Update Profile Details In Database
-  const details = [about, profession, address, phone, userId];
+  const details = [address, phone, state, addressCode, userId];
   const qreryRes = await executeQuery(updateProfileInfo, details);
 
   // Return If Query Unsuccessful

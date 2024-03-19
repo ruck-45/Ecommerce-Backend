@@ -68,10 +68,10 @@ const insertUserDetailsQuery = `
 const updateProfileInfo = `
     UPDATE profile
     SET
-      about = ?,
-      profession = ?,
       address = ?,
-      phone = ?
+      phone = ?,
+      state = ?,
+      address_code = ?
     WHERE user_id = ?
   `;
 
