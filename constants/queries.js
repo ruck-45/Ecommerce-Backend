@@ -45,7 +45,7 @@ const createItemsTableQuery = `
         discountPercent FLOAT,
         quantity INT,
         material TEXT,
-        dimension TEXT,
+        dimension VARCHAR(40),
         description TEXT,
         topLevelCategory TEXT,
         secondLevelCategory TEXT,
