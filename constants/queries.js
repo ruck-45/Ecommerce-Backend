@@ -35,25 +35,29 @@ const createProfileTableQuery = `
 
 const createItemsTableQuery = `
       CREATE TABLE IF NOT EXISTS items (
-        item_id VARCHAR(30) PRIMARY KEY,
-        imageUrl JSON,
-        brand TEXT,
-        title TEXT,
-        color TEXT,
-        discountedPrice FLOAT,
-        price FLOAT,
-        discountPercent FLOAT,
-        quantity INT,
-        material TEXT,
-        dimension VARCHAR(40),
-        description TEXT,
-        topLevelCategory TEXT,
-        secondLevelCategory TEXT,
-        thirdLevelCategory TEXT,
-        orders INT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
+      item_id VARCHAR(30) PRIMARY KEY,
+      imageUrl JSON,
+      brand TEXT,
+      title TEXT,
+      color TEXT,
+      discountedPrice FLOAT,
+      price FLOAT,
+      discountPercent FLOAT,
+      highlights JSON,
+      details TEXT,
+      quantity INT,
+      material TEXT,
+      dimension VARCHAR(40),
+      description TEXT,
+      topLevelCategory TEXT,
+      secondLevelCategory TEXT,
+      thirdLevelCategory TEXT,
+      orders INT,
+      minimumOrder INT DEFAULT 1,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
 
 const createBlogTableQuery = `
     CREATE TABLE IF NOT EXISTS blogs (
