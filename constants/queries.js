@@ -36,7 +36,7 @@ const createProfileTableQuery = `
 const createItemsTableQuery = `
       CREATE TABLE IF NOT EXISTS items (
       item_id VARCHAR(30) PRIMARY KEY,
-      imageUrl JSON,
+      imageCount INT,
       brand TEXT,
       title TEXT,
       color TEXT,
@@ -77,6 +77,30 @@ const createBlogContentTableQuery = `
       content JSON,
       FOREIGN KEY (blog_id) REFERENCES blogs(blog_id)
     );
+  `;
+
+  const createItemQuery = `
+    INSERT INTO items (
+      item_id,
+      imageCount,
+      brand,
+      title,
+      color,
+      discountedPrice,
+      price,
+      discountPercent,
+      highlights,
+      details,
+      quantity,
+      material,
+      dimension,
+      description,
+      topLevelCategory,
+      secondLevelCategory,
+      thirdLevelCategory,
+      orders,
+      minimumOrder
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
 // ********************************** Initialize / Update Table Queries ***********************************************
@@ -159,4 +183,5 @@ module.exports = {
   getTotalItemsQuery,
   getItemsQuery,
   getItemByIdQuery,
+  createItemQuery,
 };

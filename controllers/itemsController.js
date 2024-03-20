@@ -1,5 +1,5 @@
 const { executeQuery } = require("../utils/database");
-const { getItemByIdQuery } = require("../constants/queries");
+const { getItemByIdQuery, createItemQuery } = require("../constants/queries");
 
 const genItemsId = (counter) => {
   const currentDate = new Date();
@@ -67,7 +67,7 @@ const getItems = async (req, res) => {
 
   // Apply pagination
   getItemsQuery += ` LIMIT ${end} OFFSET ${start}`;
-
+  console.log("getItemsQuery: " + getItemsQuery);
   const items = await executeQuery(getItemsQuery);
   if (!items.success) {
     return res.status(404).json({
@@ -109,4 +109,60 @@ const getItemById = async (req, res) => {
   return res.status(200).json({ success: true, payload: { result: queryRes.result[0][0] } });
 };
 
-module.exports = { genItemsId, getItems, getItemById };
+const createItem = async (req, res) => {
+  const {
+    brand,
+    title,
+    color,
+    discountedPrice,
+    price,
+    discountPercent,
+    highlights,
+    details,
+    quantity,
+    material,
+    dimension,
+    description,
+    topLevelCategory,
+    secondLevelCategory,
+    thirdLevelCategory,
+    orders,
+    registerCounter,
+    imageCount,
+  } = req.body;
+
+  const minimumOrder = req.body.minimumOrder || 1; // Set minimumOrder to 1 if not provided
+  const itemId = genItemsId(registerCounter);
+  const values = [
+    itemId,
+    imageCount,
+    brand,
+    title,
+    color,
+    discountedPrice,
+    price,
+    discountPercent,
+    JSON.stringify(highlights),
+    details,
+    quantity,
+    material,
+    dimension,
+    description,
+    topLevelCategory,
+    secondLevelCategory,
+    thirdLevelCategory,
+    orders,
+    minimumOrder,
+  ];
+
+  try {
+    await executeQuery(createItemQuery, values);
+    return res.status(200).json({ success: true, payload: { message: "Item created successfully" } });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, payload: { message: "Failed to create item", error: error.message } });
+  }
+};
+
+module.exports = { genItemsId, getItems, getItemById, createItem };
