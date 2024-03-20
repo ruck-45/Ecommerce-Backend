@@ -47,7 +47,7 @@ const createItemsTableQuery = `
       details TEXT,
       quantity INT,
       material TEXT,
-      dimension VARCHAR(40),
+      dimension TEXT,
       description TEXT,
       topLevelCategory TEXT,
       secondLevelCategory TEXT,
