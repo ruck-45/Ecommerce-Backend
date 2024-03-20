@@ -30,10 +30,6 @@ const getItems = async (req, res) => {
   const saleFilter = req.query.sale;
   const searchQuery = req.query.search;
 
-  if (start >= end) {
-    return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
-  }
-
   let getItemsQuery = `SELECT * FROM items WHERE 1=1`;
   let countQuery = "SELECT COUNT(*) AS totalItems FROM items WHERE 1=1";
 
@@ -67,7 +63,6 @@ const getItems = async (req, res) => {
 
   // Apply pagination
   getItemsQuery += ` LIMIT ${end} OFFSET ${start}`;
-  console.log("getItemsQuery: " + getItemsQuery);
   const items = await executeQuery(getItemsQuery);
   if (!items.success) {
     return res.status(404).json({
@@ -158,9 +153,7 @@ const createItem = async (req, res) => {
   try {
     const item = await executeQuery(createItemQuery, values);
     if (!item.success) {
-      return res
-        .status(400)
-        .json({ success: false, payload: { message: "Failed to Create item" } });
+      return res.status(400).json({ success: false, payload: { message: "Failed to Create item" } });
     }
     return res.status(200).json({ success: true, payload: { message: "Item created successfully" } });
   } catch (error) {
@@ -169,7 +162,6 @@ const createItem = async (req, res) => {
       .json({ success: false, payload: { message: "Failed to create item", error: error.message } });
   }
 };
-
 
 const updateItem = async (req, res) => {
   const {
@@ -219,9 +211,7 @@ const updateItem = async (req, res) => {
   try {
     const updateitem = await executeQuery(updateItemQuery, values);
     if (!updateitem.success) {
-      return res
-        .status(400)
-        .json({ success: false, payload: { message: "Failed to update item" } });
+      return res.status(400).json({ success: false, payload: { message: "Failed to update item" } });
     }
     return res.status(200).json({ success: true, payload: { message: "Item updated successfully" } });
   } catch (error) {
@@ -231,16 +221,13 @@ const updateItem = async (req, res) => {
   }
 };
 
-
 const deleteItem = async (req, res) => {
   const { item_id } = req.body; // Assuming item_id is passed in the URL params
 
   try {
     const queryRes = await executeQuery(deleteItemQuery, [item_id]);
     if (!queryRes.success) {
-      return res
-        .status(400)
-        .json({ success: false, payload: { message: "Failed to delete item" } });
+      return res.status(400).json({ success: false, payload: { message: "Failed to delete item" } });
     }
     return res.status(200).json({ success: true, payload: { message: "Item deleted successfully" } });
   } catch (error) {
@@ -249,6 +236,5 @@ const deleteItem = async (req, res) => {
       .json({ success: false, payload: { message: "Failed to delete item", error: error.message } });
   }
 };
-
 
 module.exports = { genItemsId, getItems, getItemById, createItem, updateItem, deleteItem };
