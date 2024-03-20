@@ -1,5 +1,5 @@
 const { executeQuery } = require("../utils/database");
-const { getItemByIdQuery, createItemQuery, updateItemQuery } = require("../constants/queries");
+const { getItemByIdQuery, createItemQuery, updateItemQuery, deleteItemQuery } = require("../constants/queries");
 
 const genItemsId = (counter) => {
   const currentDate = new Date();
@@ -232,5 +232,23 @@ const updateItem = async (req, res) => {
 };
 
 
+const deleteItem = async (req, res) => {
+  const { item_id } = req.body; // Assuming item_id is passed in the URL params
 
-module.exports = { genItemsId, getItems, getItemById, createItem, updateItem };
+  try {
+    const queryRes = await executeQuery(deleteItemQuery, [item_id]);
+    if (!queryRes.success) {
+      return res
+        .status(400)
+        .json({ success: false, payload: { message: "Failed to delete item" } });
+    }
+    return res.status(200).json({ success: true, payload: { message: "Item deleted successfully" } });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, payload: { message: "Failed to delete item", error: error.message } });
+  }
+};
+
+
+module.exports = { genItemsId, getItems, getItemById, createItem, updateItem, deleteItem };

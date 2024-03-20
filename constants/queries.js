@@ -183,6 +183,15 @@ const getItemByIdQuery = `SELECT * FROM items WHERE item_id = ?`;
 
 const getTotalItemsQuery = `SELECT COUNT(*) AS totalItems FROM items`;
 
+
+// ********************************** Delete Queries ***********************************************
+
+const deleteItemQuery = `
+  DELETE FROM items
+  WHERE item_id = ?
+`;
+
+
 module.exports = {
   checkDatabaseQuery,
   createUsersTableQuery,
@@ -209,4 +218,5 @@ module.exports = {
   getItemByIdQuery,
   createItemQuery,
   updateItemQuery,
+  deleteItemQuery,
 };

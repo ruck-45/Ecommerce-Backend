@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const passport = require("passport");
-const { getItems, getItemById, createItem, updateItem } = require("../controllers/itemsController");
+const { getItems, getItemById, createItem, updateItem, deleteItem } = require("../controllers/itemsController");
 
 const { ensureEmployee, updateRegisterCounter } = require("../middlewares/itemsMiddleware");
 
@@ -36,4 +36,10 @@ router
 router
   .route("/updateItem")
   .put(passport.authenticate("jwt", { session: false }), ensureEmployee, updateRegisterCounter, updateItem);
+
+
+router
+  .route("/deleteItem")
+  .delete(passport.authenticate("jwt", { session: false }), ensureEmployee, updateRegisterCounter, deleteItem);
+
 module.exports = router;
