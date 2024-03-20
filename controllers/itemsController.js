@@ -19,28 +19,6 @@ const genItemsId = (counter) => {
   return itemId;
 };
 
-// const getItems = async (req, res) => {
-//   const start = parseInt(req.query.start, 10) || 0;
-//   const end = parseInt(req.query.end, 10) || 16;
-
-//   if (start >= end) {
-//     return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
-//   }
-
-//   const items = await executeQuery(getItemsQuery, [end - start, start]);
-//   if (!items.success) {
-//     return res.status(404).json({
-//       success: items.success,
-//       payload: { message: "Not Found", result: items.result },
-//     });
-//   }
-
-//   return res.status(200).json({
-//     success: true,
-//     payload: { result: items.result[0] },
-//   });
-// };
-
 const getItems = async (req, res) => {
   const start = parseInt(req.query.start, 10) || 0;
   const end = parseInt(req.query.end, 10) || 16;
@@ -50,6 +28,7 @@ const getItems = async (req, res) => {
   const categoryFilter = req.query.category;
   const priceSortFilter = req.query.priceSort;
   const saleFilter = req.query.sale;
+  const searchQuery = req.query.search;
 
   if (start >= end) {
     return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
@@ -57,6 +36,11 @@ const getItems = async (req, res) => {
 
   let getItemsQuery = `SELECT * FROM items WHERE 1=1`;
   let countQuery = "SELECT COUNT(*) AS totalItems FROM items WHERE 1=1";
+
+  if (searchQuery) {
+    getItemsQuery += ` AND (brand LIKE '%${searchQuery}%' OR title LIKE '%${searchQuery}%' OR topLevelCategory LIKE '%${searchQuery}%')`;
+    countQuery += ` AND (brand LIKE '%${searchQuery}%' OR title LIKE '%${searchQuery}%' OR topLevelCategory LIKE '%${searchQuery}%')`;
+  }
 
   if (colorFilter && colorFilter !== "All") {
     getItemsQuery += ` AND color LIKE '%${colorFilter}%'`;
@@ -100,14 +84,13 @@ const getItems = async (req, res) => {
     });
   }
 
-  const totalNumberOfItems = totalItems.result[0].totalItems;
+  const totalNumberOfItems = totalItems.result[0][0].totalItems;
+
   return res.status(200).json({
     success: true,
     payload: { message: "Items fetched successfully", result: items.result[0], total: totalNumberOfItems },
   });
 };
-
-
 
 const getItemById = async (req, res) => {
   const { itemId } = req.params;
