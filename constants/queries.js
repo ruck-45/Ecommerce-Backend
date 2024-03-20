@@ -58,7 +58,6 @@ const createItemsTableQuery = `
     );
   `;
 
-
 const createBlogTableQuery = `
     CREATE TABLE IF NOT EXISTS blogs (
       blog_id varchar(40) PRIMARY KEY ,
@@ -79,7 +78,7 @@ const createBlogContentTableQuery = `
     );
   `;
 
-  const createItemQuery = `
+const createItemQuery = `
     INSERT INTO items (
       item_id,
       imageCount,
@@ -137,6 +136,31 @@ const initializeBlogContent = `
 
 const changePassword = `UPDATE users SET password_salt = ?,password_hash=? WHERE user_id = ?`;
 
+const updateItemQuery = `
+  UPDATE items 
+  SET 
+    brand = ?,
+    title = ?,
+    color = ?,
+    discountedPrice = ?,
+    price = ?,
+    discountPercent = ?,
+    highlights = ?,
+    details = ?,
+    quantity = ?,
+    material = ?,
+    dimension = ?,
+    description = ?,
+    topLevelCategory = ?,
+    secondLevelCategory = ?,
+    thirdLevelCategory = ?,
+    orders = ?,
+    minimumOrder = ?,
+    imageCount = ?
+  WHERE 
+    item_id = ?
+`;
+
 // ********************************** Find / View Queries ***********************************************
 
 const findUserEmailQuery = `SELECT * FROM users WHERE email = ?`;
@@ -184,4 +208,5 @@ module.exports = {
   getItemsQuery,
   getItemByIdQuery,
   createItemQuery,
+  updateItemQuery,
 };

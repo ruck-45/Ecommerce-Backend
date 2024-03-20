@@ -1,5 +1,5 @@
 const { executeQuery } = require("../utils/database");
-const { getItemByIdQuery, createItemQuery } = require("../constants/queries");
+const { getItemByIdQuery, createItemQuery, updateItemQuery } = require("../constants/queries");
 
 const genItemsId = (counter) => {
   const currentDate = new Date();
@@ -156,7 +156,12 @@ const createItem = async (req, res) => {
   ];
 
   try {
-    await executeQuery(createItemQuery, values);
+    const item = await executeQuery(createItemQuery, values);
+    if (!item.success) {
+      return res
+        .status(400)
+        .json({ success: false, payload: { message: "Failed to Create item" } });
+    }
     return res.status(200).json({ success: true, payload: { message: "Item created successfully" } });
   } catch (error) {
     return res
@@ -165,4 +170,67 @@ const createItem = async (req, res) => {
   }
 };
 
-module.exports = { genItemsId, getItems, getItemById, createItem };
+
+const updateItem = async (req, res) => {
+  const {
+    item_id,
+    brand,
+    title,
+    color,
+    discountedPrice,
+    price,
+    discountPercent,
+    highlights,
+    details,
+    quantity,
+    material,
+    dimension,
+    description,
+    topLevelCategory,
+    secondLevelCategory,
+    thirdLevelCategory,
+    orders,
+    minimumOrder,
+    imageCount,
+  } = req.body;
+
+  const values = [
+    brand,
+    title,
+    color,
+    discountedPrice,
+    price,
+    discountPercent,
+    JSON.stringify(highlights),
+    details,
+    quantity,
+    material,
+    dimension,
+    description,
+    topLevelCategory,
+    secondLevelCategory,
+    thirdLevelCategory,
+    orders,
+    minimumOrder,
+    imageCount,
+    item_id,
+  ];
+
+  try {
+    const updateitem = await executeQuery(updateItemQuery, values);
+    if (!updateitem.success) {
+      return res
+        .status(400)
+        .json({ success: false, payload: { message: "Failed to update item" } });
+    }
+    return res.status(200).json({ success: true, payload: { message: "Item updated successfully" } });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, payload: { message: "Failed to update item", error: error.message } });
+  }
+};
+
+
+
+module.exports = { genItemsId, getItems, getItemById, createItem, updateItem };

@@ -2,8 +2,10 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const passport = require("passport");
-const { getItems, getItemById, createItem } = require("../controllers/itemsController");
+const { getItems, getItemById, createItem, updateItem } = require("../controllers/itemsController");
+
 const { ensureEmployee, updateRegisterCounter } = require("../middlewares/itemsMiddleware");
+
 const router = express.Router();
 
 
@@ -24,8 +26,14 @@ router.use("/itemImages", express.static("./public/itemImages"));
 
 // routes
 router.route("/getItems").get(getItems);
+
 router.route("/:itemId").get(getItemById);
+
 router
   .route("/createItem")
   .post(passport.authenticate("jwt", { session: false }), ensureEmployee, updateRegisterCounter, createItem);
+
+router
+  .route("/updateItem")
+  .put(passport.authenticate("jwt", { session: false }), ensureEmployee, updateRegisterCounter, updateItem);
 module.exports = router;
