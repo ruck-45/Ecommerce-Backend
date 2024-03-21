@@ -23,11 +23,8 @@ const getItems = async (req, res) => {
   const start = parseInt(req.query.start, 10) || 0;
   const end = parseInt(req.query.end, 10) || 16;
   const colorFilter = req.query.color;
-  const newArrivalFilter = req.query.newArrival === "true";
-  const popularFilter = req.query.popular === "true";
   const categoryFilter = req.query.category;
-  const priceSortFilter = req.query.priceSort;
-  const saleFilter = req.query.sale;
+  const otherFilter = req.query.filter;
   const searchQuery = req.query.search;
 
   let getItemsQuery = `SELECT * FROM items WHERE 1=1`;
@@ -38,26 +35,26 @@ const getItems = async (req, res) => {
     countQuery += ` AND (brand LIKE '%${searchQuery}%' OR title LIKE '%${searchQuery}%' OR topLevelCategory LIKE '%${searchQuery}%')`;
   }
 
-  if (colorFilter && colorFilter !== "All") {
+  if (colorFilter && colorFilter !== "all") {
     getItemsQuery += ` AND color LIKE '%${colorFilter}%'`;
     countQuery += ` AND color LIKE '%${colorFilter}%'`;
   }
 
-  if (categoryFilter && categoryFilter !== "All") {
+  if (categoryFilter && categoryFilter !== "all") {
     getItemsQuery += ` AND (topLevelCategory LIKE '%${categoryFilter}%' OR secondLevelCategory LIKE '%${categoryFilter}%' OR thirdLevelCategory LIKE '%${categoryFilter}%')`;
     countQuery += ` AND (topLevelCategory LIKE '%${categoryFilter}%' OR secondLevelCategory LIKE '%${categoryFilter}%' OR thirdLevelCategory LIKE '%${categoryFilter}%')`;
   }
 
   // Ensure only one ORDER BY clause is applied; priority: newArrival, popular, then priceSort
-  if (newArrivalFilter) {
+  if (otherFilter === "new-arrivals") {
     getItemsQuery += ` ORDER BY created_at DESC`;
-  } else if (popularFilter) {
+  } else if (otherFilter === "popular") {
     getItemsQuery += ` ORDER BY orders DESC`;
-  } else if (priceSortFilter === "highToLow") {
+  } else if (otherFilter === "high-to-low") {
     getItemsQuery += ` ORDER BY discountedPrice DESC`;
-  } else if (priceSortFilter === "lowToHigh") {
+  } else if (otherFilter === "low-to-high") {
     getItemsQuery += ` ORDER BY discountedPrice ASC`;
-  } else if (saleFilter) {
+  } else if (otherFilter === "sale") {
     getItemsQuery += ` ORDER BY discountPercent DESC`;
   }
 

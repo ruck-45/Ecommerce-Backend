@@ -26,18 +26,13 @@ router.use("/itemImages", express.static("./public/itemImages"));
 
 // routes
 router.route("/getItems").get(getItems);
-
 router.route("/:itemId").get(getItemById);
-
 router
   .route("/createItem")
   .post(passport.authenticate("jwt", { session: false }), ensureEmployee, updateRegisterCounter, createItem);
-
 router
   .route("/updateItem")
   .put(passport.authenticate("jwt", { session: false }), ensureEmployee, updateRegisterCounter, updateItem);
-
-
 router
   .route("/deleteItem")
   .delete(passport.authenticate("jwt", { session: false }), ensureEmployee, updateRegisterCounter, deleteItem);
