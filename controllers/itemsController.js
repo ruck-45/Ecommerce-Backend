@@ -30,7 +30,7 @@ const getItems = async (req, res) => {
   let getItemsQuery = `SELECT * FROM items WHERE 1=1`;
   let countQuery = "SELECT COUNT(*) AS totalItems FROM items WHERE 1=1";
 
-  if (searchQuery !== "") {
+  if (searchQuery) {
     getItemsQuery += ` AND (brand LIKE '%${searchQuery}%' OR title LIKE '%${searchQuery}%' OR topLevelCategory LIKE '%${searchQuery}%')`;
     countQuery += ` AND (brand LIKE '%${searchQuery}%' OR title LIKE '%${searchQuery}%' OR topLevelCategory LIKE '%${searchQuery}%')`;
   }
