@@ -1,6 +1,7 @@
 const { executeQuery } = require("../utils/database");
 const { getItemByIdQuery, createItemQuery, updateItemQuery, deleteItemQuery } = require("../constants/queries");
 
+
 const genItemsId = (counter) => {
   const currentDate = new Date();
   const timestampComponent = currentDate.toISOString().slice(0, 19).replace(/[-:T]/g, "");
@@ -58,7 +59,6 @@ const getItems = async (req, res) => {
     getItemsQuery += ` ORDER BY discountPercent DESC`;
   }
 
-  // Apply pagination
   getItemsQuery += ` LIMIT ${end} OFFSET ${start}`;
   const items = await executeQuery(getItemsQuery);
   if (!items.success) {
@@ -219,7 +219,7 @@ const updateItem = async (req, res) => {
 };
 
 const deleteItem = async (req, res) => {
-  const { item_id } = req.body; // Assuming item_id is passed in the URL params
+  const { item_id } = req.body;
 
   try {
     const queryRes = await executeQuery(deleteItemQuery, [item_id]);
@@ -234,4 +234,14 @@ const deleteItem = async (req, res) => {
   }
 };
 
-module.exports = { genItemsId, getItems, getItemById, createItem, updateItem, deleteItem };
+const uploadItemImages = async (req, res) => {
+  // console.log("req.files", req)
+  if (!req.files) {
+    return res.status(400).json({ success: false, payload: { message: "Image Upload Failed" } });
+  }
+
+  return res.status(200).json({ success: true, payload: { message: "Image Uploaded Successfully" } });
+};
+
+
+module.exports = { genItemsId, getItems, getItemById, createItem, updateItem, deleteItem, uploadItemImages };

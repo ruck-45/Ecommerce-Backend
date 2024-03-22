@@ -2,24 +2,33 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const passport = require("passport");
-const { getItems, getItemById, createItem, updateItem, deleteItem } = require("../controllers/itemsController");
+const {
+  getItems,
+  getItemById,
+  createItem,
+  updateItem,
+  deleteItem,
+  uploadItemImages,
+} = require("../controllers/itemsController");
 
 const { ensureEmployee, updateRegisterCounter } = require("../middlewares/itemsMiddleware");
 
 const router = express.Router();
 
-
-const blogStorage = multer.diskStorage({
+const itemStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "..", "public", "blogImages")); // Folder where Images Are saved
+    cb(null, path.join(__dirname, "..", "public", "itemImages")); // Folder where Images Are saved
   },
   filename: (req, file, cb) => {
-    const imageId = req.header("imageId");
-    cb(null, `${imageId}.jpg`); // file Name
+    const itemId = req.header("itemId");
+    const imageIndex = req.files.length;
+    const ext = file.originalname.split(".").pop();
+    const filename = `${itemId}_img${imageIndex}.${ext}`;
+    cb(null, filename);
   },
 });
-const storeItemImage = multer({ storage: blogStorage });
 
+const storeItemImage = multer({ storage: itemStorage });
 
 // middleware
 router.use("/itemImages", express.static("./public/itemImages"));
@@ -37,4 +46,14 @@ router
   .route("/deleteItem")
   .delete(passport.authenticate("jwt", { session: false }), ensureEmployee, updateRegisterCounter, deleteItem);
 
+router
+  .route("/itemImages")
+  .post(
+    passport.authenticate("jwt", { session: false }),
+    ensureEmployee,
+    storeItemImage.array("images", 4),
+    uploadItemImages
+  );
+
+  
 module.exports = router;
