@@ -14,6 +14,10 @@ const {
   updateProfileInfo,
   checkEmployeeQuery,
   changePassword,
+  getCartQuery,
+  getOrdersQuery,
+  updateCartQuery,
+  itemCheckQuery,
 } = require("../constants/queries");
 
 const { sendEmail } = require("../utils/sendmail");
@@ -281,6 +285,83 @@ const resetPassword = async (req, res) => {
   return res.status(201).json({ success: true, payload: { message: "Password changed successfully." } });
 };
 
+const getCart = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const queryRes = await executeQuery(getCartQuery, [userId]);
+    if (!queryRes.success) {
+      return res.status(404).json({
+        success: queryRes.success,
+        payload: { message: "Cart Data Not Found", result: queryRes.result },
+      });
+    }
+    const cartData = queryRes.result[0][0].cart;
+    return res
+      .status(200)
+      .json({ success: true, payload: { message: "Cart Data fetched successfully.", cart: cartData } });
+  } catch (error) {
+    return res.status(500).json({ success: false, payload: { message: "Internal Server Error" } });
+  }
+};
+
+const getOrders = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const queryRes = await executeQuery(getOrdersQuery, [userId]);
+    if (!queryRes.success) {
+      return res.status(404).json({
+        success: queryRes.success,
+        payload: { message: "Order Data Not Found", result: queryRes.result },
+      });
+    }
+    const ordersData = queryRes.result[0][0].orders;
+    return res
+      .status(200)
+      .json({ success: true, payload: { message: "Orders fetched successfully.", orders: ordersData } });
+  } catch (error) {
+    return res.status(500).json({ success: false, payload: { message: "Internal Server Error" } });
+  }
+};
+
+const addToCart = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const { itemId, quantity } = req.body;
+    const itemCheckResult = await executeQuery(itemCheckQuery, [itemId]);
+    const itemCount = itemCheckResult.result[0][0].item_count;
+    if (itemCount === 0) {
+      return res.status(404).json({
+        success: false,
+        payload: { message: "Item does not exist" },
+      });
+    }
+    const cart = await executeQuery(getCartQuery, [userId]);
+    if (!cart.success) {
+      return res.status(404).json({
+        success: cart.success,
+        payload: { message: "Cart Data Not Found", result: cart.result },
+      });
+    }
+    const cartData = cart.result[0][0].cart || [];
+    const existingItemIndex = cartData.findIndex((item) => item.item_id === itemId);
+    if (existingItemIndex !== -1) {
+      cartData[existingItemIndex].itemQuantity += quantity;
+    } else {
+      cartData.push({ item_id: itemId, itemQuantity: quantity });
+    }
+
+    const updateCartRes = await executeQuery(updateCartQuery, [JSON.stringify(cartData), userId]);
+
+    if (!updateCartRes.success) {
+      return res.status(500).json({ success: false, payload: { message: "Error while updating cart." } });
+    }
+
+    return res.status(200).json({ success: true, payload: { message: "Item added to cart successfully" } });
+  } catch (error) {
+    return res.status(500).json({ success: false, payload: { message: "Internal Server Error" } });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -289,4 +370,7 @@ module.exports = {
   updateProfileImage,
   forgotPassword,
   resetPassword,
+  getCart,
+  addToCart,
+  getOrders,
 };

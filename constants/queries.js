@@ -11,6 +11,7 @@ const createUsersTableQuery = `
         password_salt VARCHAR(64) NOT NULL,
         password_hash VARCHAR(128) NOT NULL,
         email VARCHAR(100) UNIQUE NOT NULL,
+        visit_count BIGINT,
         registration_date DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `;
@@ -29,6 +30,9 @@ const createProfileTableQuery = `
         phone VARCHAR(20),
         state TEXT,
         address_code TEXT,
+        cart JSON,
+        orders JSON,
+        purchase_count INT,
         FOREIGN KEY (user_id) REFERENCES users(user_id)
       );
     `;
@@ -161,6 +165,9 @@ const updateItemQuery = `
     item_id = ?
 `;
 
+const updateCartQuery = `UPDATE profile SET cart = ? WHERE user_id = ?`;
+
+
 // ********************************** Find / View Queries ***********************************************
 
 const findUserEmailQuery = `SELECT * FROM users WHERE email = ?`;
@@ -183,6 +190,11 @@ const getItemByIdQuery = `SELECT * FROM items WHERE item_id = ?`;
 
 const getTotalItemsQuery = `SELECT COUNT(*) AS totalItems FROM items`;
 
+const getCartQuery = `SELECT cart FROM profile WHERE user_id = ?`;
+
+const getOrdersQuery = `SELECT orders FROM profile WHERE user_id = ?`;
+
+const itemCheckQuery = `SELECT COUNT(*) AS item_count FROM items WHERE item_id = ?`;
 
 // ********************************** Delete Queries ***********************************************
 
@@ -190,7 +202,6 @@ const deleteItemQuery = `
   DELETE FROM items
   WHERE item_id = ?
 `;
-
 
 module.exports = {
   checkDatabaseQuery,
@@ -219,4 +230,8 @@ module.exports = {
   createItemQuery,
   updateItemQuery,
   deleteItemQuery,
+  getCartQuery,
+  getOrdersQuery,
+  updateCartQuery,
+  itemCheckQuery,
 };
