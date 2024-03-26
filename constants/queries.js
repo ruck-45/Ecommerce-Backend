@@ -196,6 +196,9 @@ const getOrdersQuery = `SELECT orders FROM profile WHERE user_id = ?`;
 
 const itemCheckQuery = `SELECT COUNT(*) AS item_count FROM items WHERE item_id = ?`;
 
+const getCartItemQuery = `SELECT * FROM items where item_id = ?`;
+
+
 // ********************************** Delete Queries ***********************************************
 
 const deleteItemQuery = `
@@ -234,4 +237,5 @@ module.exports = {
   getOrdersQuery,
   updateCartQuery,
   itemCheckQuery,
+  getCartItemQuery,
 };

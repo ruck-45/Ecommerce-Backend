@@ -152,7 +152,7 @@ const createItem = async (req, res) => {
     if (!item.success) {
       return res.status(400).json({ success: false, payload: { message: "Failed to Create item" } });
     }
-    return res.status(200).json({ success: true, payload: { message: "Item created successfully" } });
+    return res.status(200).json({ success: true, payload: { message: "Item created successfully", itemId } });
   } catch (error) {
     return res
       .status(500)
