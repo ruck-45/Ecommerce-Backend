@@ -4,7 +4,7 @@
   "description": "Backend for Kreative Machinez Website",
   "main": "app.js",
   "scripts": {
-    "start": "pm2 start app.js",
+    "start": "nodemon app.js",
     "delete": "pm2 delete all",
     "list": "pm2 ls",
     "restart": "pm2 restart app.js",

@@ -235,7 +235,6 @@ const deleteItem = async (req, res) => {
 };
 
 const uploadItemImages = async (req, res) => {
-  // console.log("req.files", req)
   if (!req.files) {
     return res.status(400).json({ success: false, payload: { message: "Image Upload Failed" } });
   }

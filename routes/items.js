@@ -20,12 +20,8 @@ const itemStorage = multer.diskStorage({
     cb(null, path.join(__dirname, "..", "public", "itemImages")); // Folder where Images Are saved
   },
   filename: (req, file, cb) => {
-    const itemId = req.header("itemId");
-    const imageIndex = req.files.length;
-    const ext = file.originalname.split(".").pop();
-    const filename = `${itemId}_img${imageIndex}.${ext}`;
-    cb(null, filename);
-  },
+    cb(null, file.originalname); // Use the original filename (Multer will handle unique filenames)
+  }
 });
 
 const storeItemImage = multer({ storage: itemStorage });
