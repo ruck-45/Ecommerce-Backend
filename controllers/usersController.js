@@ -18,6 +18,7 @@ const {
   getOrdersQuery,
   updateCartQuery,
   itemCheckQuery,
+  getCartItemQuery,
 } = require("../constants/queries");
 
 const { sendEmail } = require("../utils/sendmail");
@@ -288,17 +289,42 @@ const resetPassword = async (req, res) => {
 const getCart = async (req, res) => {
   try {
     const userId = req.user.user_id;
+
+    // Fetch cart data for the user
     const queryRes = await executeQuery(getCartQuery, [userId]);
+
     if (!queryRes.success) {
       return res.status(404).json({
         success: queryRes.success,
         payload: { message: "Cart Data Not Found", result: queryRes.result },
       });
     }
+
     const cartData = queryRes.result[0][0].cart;
-    return res
-      .status(200)
-      .json({ success: true, payload: { message: "Cart Data fetched successfully.", cart: cartData } });
+    console.log("first cart data", cartData);
+    // Fetch item details for each itemId in the cart
+    const items = await Promise.all(
+      cartData.map(async (itemId) => {
+        const itemQueryRes = await executeQuery(getCartItemQuery, [itemId]);
+        if (itemQueryRes.success) {
+          
+          return itemQueryRes.result[0][0]; 
+        }
+        return null; // Item not found or query unsuccessful
+      })
+    );
+
+    // Remove null items (if any) from the items array
+    const filteredItems = items.filter((item) => item !== null);
+
+
+    return res.status(200).json({
+      success: true,
+      payload: {
+        message: "Cart Data fetched successfully.",
+        cart: filteredItems, // Send the array of item details
+      },
+    });
   } catch (error) {
     return res.status(500).json({ success: false, payload: { message: "Internal Server Error" } });
   }
@@ -326,30 +352,40 @@ const getOrders = async (req, res) => {
 const addToCart = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const { itemId, quantity } = req.body;
+    const { itemId } = req.body;
+
+    // Check if the item exists in the items table
     const itemCheckResult = await executeQuery(itemCheckQuery, [itemId]);
     const itemCount = itemCheckResult.result[0][0].item_count;
+
     if (itemCount === 0) {
       return res.status(404).json({
         success: false,
         payload: { message: "Item does not exist" },
       });
     }
+
+    // Fetch cart data for the user
     const cart = await executeQuery(getCartQuery, [userId]);
+
     if (!cart.success) {
       return res.status(404).json({
         success: cart.success,
         payload: { message: "Cart Data Not Found", result: cart.result },
       });
     }
+
     const cartData = cart.result[0][0].cart || [];
-    const existingItemIndex = cartData.findIndex((item) => item.item_id === itemId);
-    if (existingItemIndex !== -1) {
-      cartData[existingItemIndex].itemQuantity += quantity;
-    } else {
-      cartData.push({ item_id: itemId, itemQuantity: quantity });
+
+    // Check if the item already exists in the cart
+    if (cartData.includes(itemId)) {
+      return res.status(200).json({ success: true, payload: { message: "Item already in cart" } });
     }
 
+    // Add the item to the cart
+    cartData.push(itemId);
+
+    // Update the cart data in the database
     const updateCartRes = await executeQuery(updateCartQuery, [JSON.stringify(cartData), userId]);
 
     if (!updateCartRes.success) {
@@ -357,6 +393,39 @@ const addToCart = async (req, res) => {
     }
 
     return res.status(200).json({ success: true, payload: { message: "Item added to cart successfully" } });
+  } catch (error) {
+    return res.status(500).json({ success: false, payload: { message: "Internal Server Error" } });
+  }
+};
+
+const removeFromCart = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const { itemId } = req.body;
+
+    // Fetch cart data for the user
+    const cart = await executeQuery(getCartQuery, [userId]);
+
+    if (!cart.success) {
+      return res.status(404).json({
+        success: cart.success,
+        payload: { message: "Cart Data Not Found", result: cart.result },
+      });
+    }
+
+    let cartData = cart.result[0][0].cart || [];
+    console.log("initial cart data", cartData);
+    // Remove the item from the cart if it exists
+    cartData = cartData.filter((item) => item !== itemId);
+    console.log("filterd card data ", cartData)
+    // Update the cart data in the database
+    const updateCartRes = await executeQuery(updateCartQuery, [JSON.stringify(cartData), userId]);
+
+    if (!updateCartRes.success) {
+      return res.status(500).json({ success: false, payload: { message: "Error while updating cart." } });
+    }
+
+    return res.status(200).json({ success: true, payload: { message: "Item removed from cart successfully" } });
   } catch (error) {
     return res.status(500).json({ success: false, payload: { message: "Internal Server Error" } });
   }
@@ -373,4 +442,5 @@ module.exports = {
   getCart,
   addToCart,
   getOrders,
+  removeFromCart,
 };

@@ -1,7 +1,7 @@
 {
-  "name": "kreativemachinez-backend",
+  "name": "shopnest-backend",
   "version": "1.0.0",
-  "description": "Backend for Kreative Machinez Website",
+  "description": "Backend for shopnest Website",
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
