@@ -42,8 +42,6 @@ testConnection();
 createUsersTable();
 createEmployeesTable();
 createProfileTable();
-createBlogTable();
-blogContentTable();
 createItemsTable();
 
 
