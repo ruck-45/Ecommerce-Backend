@@ -26,11 +26,11 @@ const sendEmail = async (email, subject, message) => {
 const emailTemplate = (clientEmail, clientMessage, clientSubject) => `
     <html>
     <body>
-      <p>Hello KreativeMachine Team,<p>
+      <p>Hello ShopNest Team,<p>
       <p> You have a message from: email : ${clientEmail}</p>
       <p>Subject: ${clientSubject}</p>
       <p>Message: ${clientMessage}</p>
-      <p>Regards,<br>Kreative Machine</p>
+      <p>Regards,<br>ShopNest</p>
     </body>
     </html>
 `;

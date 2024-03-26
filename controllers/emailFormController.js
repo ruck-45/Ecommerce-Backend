@@ -9,10 +9,10 @@ const emailSent = async (req, res) => {
     if (email === undefined || name === undefined || subject === undefined || message === undefined) {
       return res.status(206).json({ success: false, payload: { message: "Please fill all details" } });
     }
-    console.log(req.body)
+
     //To email
     const adminEmail = process.env.ADMIN_MAIL;
-    console.log(adminEmail)
+
     await sendEmail(adminEmail, subject, emailTemplate(email, message, subject));
     res.status(200).json({
       success: true,
