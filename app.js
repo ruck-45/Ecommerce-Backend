@@ -8,6 +8,7 @@ const passport = require("passport");
 const users = require("./routes/users");
 const blogs = require("./routes/blogs");
 const items = require("./routes/items");
+const contact = require("./routes/contact");
 const {
   testConnection,
   createUsersTable,
@@ -32,7 +33,9 @@ app.use(cors());
 // Routes
 app.use("/api/users", users);
 app.use("/api/blogs", blogs);
-app.use("/api/items", items)
+app.use("/api/items", items);
+app.use("/api/contact", contact);
+
 
 // Database Connection and Configuration
 testConnection();
