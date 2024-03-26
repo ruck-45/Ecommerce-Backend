@@ -16,7 +16,7 @@ const {
   getCart,
   getOrders,
   addToCart,
-  removeFromCart
+  removeFromCart,
 } = require("../controllers/usersController");
 const { updateRegisterCounter } = require("../middlewares/usersMiddlewares");
 
@@ -48,10 +48,10 @@ router.route("/reset-password").put(passport.authenticate("jwt", { session: fals
 
 // ****************************  Cart Routes  ************************************************************
 
+router.route("/cart").get(passport.authenticate("jwt", { session: false }), getCart);
 router
-  .route("/cart")
-  .get(passport.authenticate("jwt", { session: false }), getCart)
-  .post(passport.authenticate("jwt", { session: false }), addToCart)
+  .route("/cart/:itemId")
+  .put(passport.authenticate("jwt", { session: false }), addToCart)
   .delete(passport.authenticate("jwt", { session: false }), removeFromCart);
 router.route("/orders").get(passport.authenticate("jwt", { session: false }), getOrders);
 

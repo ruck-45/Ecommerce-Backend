@@ -14,14 +14,11 @@ const {
   createUsersTable,
   createEmployeesTable,
   createProfileTable,
-  createBlogTable,
-  blogContentTable,
-  createItemsTable
-  
+  createItemsTable,
 } = require("./utils/database");
 require("./config/passportConfig")(passport);
 
-const port = process.env.PORT ;
+const port = process.env.PORT;
 const app = express();
 
 // Essential Middlewares
@@ -36,15 +33,12 @@ app.use("/api/blogs", blogs);
 app.use("/api/items", items);
 app.use("/api/contact", contact);
 
-
 // Database Connection and Configuration
 testConnection();
 createUsersTable();
 createEmployeesTable();
 createProfileTable();
 createItemsTable();
-
-
 
 app.listen(port, () => {
   console.log("Server Listening on PORT:", port);

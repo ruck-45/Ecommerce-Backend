@@ -299,16 +299,14 @@ const getCart = async (req, res) => {
         payload: { message: "Cart Data Not Found", result: queryRes.result },
       });
     }
-
     const cartData = queryRes.result[0][0].cart;
-    console.log("first cart data", cartData);
+
     // Fetch item details for each itemId in the cart
     const items = await Promise.all(
       cartData.map(async (itemId) => {
         const itemQueryRes = await executeQuery(getCartItemQuery, [itemId]);
         if (itemQueryRes.success) {
-          
-          return itemQueryRes.result[0][0]; 
+          return itemQueryRes.result[0][0];
         }
         return null; // Item not found or query unsuccessful
       })
@@ -316,7 +314,6 @@ const getCart = async (req, res) => {
 
     // Remove null items (if any) from the items array
     const filteredItems = items.filter((item) => item !== null);
-
 
     return res.status(200).json({
       success: true,
@@ -350,10 +347,10 @@ const getOrders = async (req, res) => {
 };
 
 const addToCart = async (req, res) => {
-  try {
-    const userId = req.user.user_id;
-    const { itemId } = req.body;
+  const userId = req.user.user_id;
+  const { itemId } = req.params;
 
+  try {
     // Check if the item exists in the items table
     const itemCheckResult = await executeQuery(itemCheckQuery, [itemId]);
     const itemCount = itemCheckResult.result[0][0].item_count;
@@ -399,10 +396,10 @@ const addToCart = async (req, res) => {
 };
 
 const removeFromCart = async (req, res) => {
-  try {
-    const userId = req.user.user_id;
-    const { itemId } = req.body;
+  const userId = req.user.user_id;
+  const { itemId } = req.params;
 
+  try {
     // Fetch cart data for the user
     const cart = await executeQuery(getCartQuery, [userId]);
 
@@ -414,10 +411,10 @@ const removeFromCart = async (req, res) => {
     }
 
     let cartData = cart.result[0][0].cart || [];
-    console.log("initial cart data", cartData);
+
     // Remove the item from the cart if it exists
     cartData = cartData.filter((item) => item !== itemId);
-    console.log("filterd card data ", cartData)
+
     // Update the cart data in the database
     const updateCartRes = await executeQuery(updateCartQuery, [JSON.stringify(cartData), userId]);
 

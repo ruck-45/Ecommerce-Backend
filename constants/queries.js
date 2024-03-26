@@ -109,8 +109,8 @@ const createItemQuery = `
 // ********************************** Initialize / Update Table Queries ***********************************************
 
 const initializeUserProfile = `
-  INSERT INTO profile (user_id, address, phone, state, address_code)
-  VALUES (?, "", "", "", "")
+  INSERT INTO profile (user_id, address, phone, state, address_code, cart, orders, purchase_count)
+  VALUES (?, "", "", "", "","[]", "[]", 0)
 `;
 
 const insertUserDetailsQuery = `
@@ -167,7 +167,6 @@ const updateItemQuery = `
 
 const updateCartQuery = `UPDATE profile SET cart = ? WHERE user_id = ?`;
 
-
 // ********************************** Find / View Queries ***********************************************
 
 const findUserEmailQuery = `SELECT * FROM users WHERE email = ?`;
@@ -197,7 +196,6 @@ const getOrdersQuery = `SELECT orders FROM profile WHERE user_id = ?`;
 const itemCheckQuery = `SELECT COUNT(*) AS item_count FROM items WHERE item_id = ?`;
 
 const getCartItemQuery = `SELECT * FROM items where item_id = ?`;
-
 
 // ********************************** Delete Queries ***********************************************
 
