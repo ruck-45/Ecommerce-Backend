@@ -21,11 +21,9 @@ const itemStorage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const itemId = req.header("itemId");
-    console.log("itemId: " + itemId);
     const imageIndex = req.files.length;
     const ext = file.originalname.split(".").pop();
     const filename = `${itemId}_img${imageIndex}.${ext}`;
-    console.log("file: " + filename);
     cb(null, filename);
   }
 });
