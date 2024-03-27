@@ -202,10 +202,16 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   const userId = req.user.user_id;
-  const { phone, address, state, addressCode } = req.body;
+  const { phone, address, state, addressCode, city } = req.body;
 
   // Return If Partial Information Provided
-  if (phone === undefined || address === undefined || state === undefined || addressCode === undefined) {
+  if (
+    phone === undefined ||
+    city === undefined ||
+    address === undefined ||
+    state === undefined ||
+    addressCode === undefined
+  ) {
     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
 
@@ -215,7 +221,7 @@ const updateProfile = async (req, res) => {
   }
 
   // Update Profile Details In Database
-  const details = [address, phone, state, addressCode, userId];
+  const details = [address, phone, city, state, addressCode, userId];
   const qreryRes = await executeQuery(updateProfileInfo, details);
 
   // Return If Query Unsuccessful

@@ -28,6 +28,7 @@ const createProfileTableQuery = `
         user_id VARCHAR(30) PRIMARY KEY,
         address TEXT,
         phone VARCHAR(20),
+        city TEXT,
         state TEXT,
         address_code TEXT,
         cart JSON,
@@ -109,8 +110,8 @@ const createItemQuery = `
 // ********************************** Initialize / Update Table Queries ***********************************************
 
 const initializeUserProfile = `
-  INSERT INTO profile (user_id, address, phone, state, address_code, cart, orders, purchase_count)
-  VALUES (?, "", "", "", "","[]", "[]", 0)
+  INSERT INTO profile (user_id, address, phone, city, state, address_code, cart, orders, purchase_count)
+  VALUES (?, "", "", "", "", "","[]", "[]", 0)
 `;
 
 const insertUserDetailsQuery = `
@@ -123,6 +124,7 @@ const updateProfileInfo = `
     SET
       address = ?,
       phone = ?,
+      city = ?,
       state = ?,
       address_code = ?
     WHERE user_id = ?
