@@ -1,7 +1,6 @@
 const { executeQuery } = require("../utils/database");
 const { getItemByIdQuery, createItemQuery, updateItemQuery, deleteItemQuery } = require("../constants/queries");
 
-
 const genItemsId = (counter) => {
   const currentDate = new Date();
   const timestampComponent = currentDate.toISOString().slice(0, 19).replace(/[-:T]/g, "");
@@ -219,7 +218,9 @@ const updateItem = async (req, res) => {
 };
 
 const deleteItem = async (req, res) => {
-  const { item_id } = req.body;
+  const { id } = req.body;
+
+  const item_id = id;
 
   try {
     const queryRes = await executeQuery(deleteItemQuery, [item_id]);
@@ -240,6 +241,5 @@ const uploadItemImages = async (req, res) => {
   }
   return res.status(200).json({ success: true, payload: { message: "Image Uploaded Successfully" } });
 };
-
 
 module.exports = { genItemsId, getItems, getItemById, createItem, updateItem, deleteItem, uploadItemImages };
